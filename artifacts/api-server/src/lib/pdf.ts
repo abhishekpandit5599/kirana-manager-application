@@ -57,7 +57,7 @@ export async function generateInvoicePdf(invoice: InvoiceForPdf): Promise<Buffer
 
     const browser = await puppeteer.launch({
       headless: true,
-      executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
 
     const page = await browser.newPage();

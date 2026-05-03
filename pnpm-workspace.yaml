@@ -74,6 +74,7 @@ onlyBuiltDependencies:
   - msw
   - tesseract.js
   - unrs-resolver
+  - puppeteer
 
 overrides:
   # Keep only unnecessary non-macOS non-linux-x64 esbuild platforms excluded

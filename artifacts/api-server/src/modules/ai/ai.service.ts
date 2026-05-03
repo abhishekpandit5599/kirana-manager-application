@@ -17,9 +17,10 @@ const HINDI_MAP: Record<string, string> = {
 const UNIT_MAP: Record<string, string> = {
   kilo: "kg", kilogram: "kg", kilograms: "kg", kg: "kg",
   liter: "litre", liters: "litre", litre: "litre", litres: "litre", ltr: "litre", l: "litre",
-  gram: "gm", grams: "gm", gm: "gm", g: "gm",
+  gram: "gm", grams: "gm", gms: "gm", gm: "gm", g: "gm",
   piece: "pcs", pieces: "pcs", pcs: "pcs", pc: "pcs",
   number: "pcs", nos: "pcs", dozen: "dozen", pack: "pack", packet: "pack", packets: "pack",
+  box: "box",
 };
 
 function normalizeUnit(unit: string): string { return UNIT_MAP[unit.toLowerCase().trim()] || "pcs"; }
@@ -27,20 +28,84 @@ function translateHindi(word: string): string { return HINDI_MAP[word.toLowerCas
 
 function parseItemsFromText(text: string): ParsedItem[] {
   const items: ParsedItem[] = [];
-  const lines = text.split(/[,\n;]/);
+  // Split primarily by lines
+  const lines = text.split(/\n/);
+  
   for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-    const numberUnitNamePattern = /^(\d+(?:\.\d+)?)\s*(kg|kilo|kilogram|litre?|liter?|ltr|gm?|gram?|pcs?|piece?|dozen|pack(?:et)?|number|nos?)?\s+(.+)/i;
-    const nameNumberUnitPattern = /^(.+?)\s+(\d+(?:\.\d+)?)\s*(kg|kilo|kilogram|litre?|liter?|ltr|gm?|gram?|pcs?|piece?|dozen|pack(?:et)?|number|nos?)?\s*$/i;
-    let match = trimmed.match(numberUnitNamePattern);
-    if (match) {
-      items.push({ name: match[3].trim().split(/\s+/).map(translateHindi).join(" "), quantity: parseFloat(match[1]), unit: normalizeUnit(match[2] || "pcs") });
-      continue;
+    let trimmed = line.trim();
+    if (!trimmed || trimmed.length < 2) continue;
+
+    // Clean up common noise like (optional), (thick/thin), etc.
+    trimmed = trimmed.replace(/\(.*?\)/g, "").replace(/etc\.?/gi, "").replace(/©.*/g, "").trim();
+
+    let name = "";
+    let quantityStr = "";
+    
+    // Try splitting by common separators like - or :
+    const separatorMatch = trimmed.match(/^(.+?)\s*[-:–—]\s*(.+)$/);
+    if (separatorMatch) {
+      name = separatorMatch[1].trim();
+      quantityStr = separatorMatch[2].trim();
+    } else {
+      // If no separator, try to find the transition between name and number
+      const numberRegex = /(\d+(?:\/\d+)?(?:\.\d+)?)/;
+      const numberMatch = trimmed.match(numberRegex);
+      
+      if (numberMatch) {
+        const index = numberMatch.index!;
+        const num = numberMatch[0];
+        // If number is near start, it's [Quantity] [Name]
+        if (index < trimmed.length / 3) {
+          const potentialNameStart = trimmed.substring(index + num.length).trim();
+          quantityStr = trimmed.substring(0, index + num.length + 10);
+          name = potentialNameStart;
+        } else {
+          name = trimmed.substring(0, index).trim();
+          quantityStr = trimmed.substring(index).trim();
+        }
+      } else {
+        name = trimmed;
+        quantityStr = "1";
+      }
     }
-    match = trimmed.match(nameNumberUnitPattern);
-    if (match) {
-      items.push({ name: match[1].trim().split(/\s+/).map(translateHindi).join(" "), quantity: parseFloat(match[2]), unit: normalizeUnit(match[3] || "pcs") });
+
+    // Parse Quantity and Unit from the quantity string
+    let quantity = 1;
+    let unit = "pcs";
+    
+    // Support fractions (1/2), decimals (1.5), and integers
+    const qtyMatch = quantityStr.match(/(\d+(?:\/\d+)?(?:\.\d+)?)/);
+    if (qtyMatch) {
+      const q = qtyMatch[0];
+      try {
+        if (q.includes("/")) {
+          const [num, den] = q.split("/").map(parseFloat);
+          quantity = den !== 0 ? num / den : 1;
+        } else {
+          quantity = parseFloat(q);
+        }
+      } catch {
+        quantity = 1;
+      }
+      
+      // Look for unit immediately after the number
+      const afterQty = quantityStr.substring(qtyMatch.index! + q.length).trim().toLowerCase();
+      const unitRegex = /\b(kg|kilo|kilogram|gms?|gram?|litre?|liter?|ltr|gm?|pcs?|piece?|dozen|pack(?:et)?|box|number|nos?)\b/i;
+      const unitMatch = afterQty.match(unitRegex);
+      if (unitMatch) {
+        unit = normalizeUnit(unitMatch[1]);
+      }
+    }
+
+    // Final cleanup: remove any trailing/leading dashes/noise from name
+    name = name.replace(/^[-:–—\s]+|[-:–—\s]+$/g, "").trim();
+    
+    if (name.length > 1) {
+      items.push({
+        name: name.split(/\s+/).map(translateHindi).join(" "),
+        quantity: isNaN(quantity) ? 1 : quantity,
+        unit
+      });
     }
   }
   return items;
@@ -105,24 +170,34 @@ function fuzzyMatch(query: string, target: string): number {
 
   const wordSimilarity = wordMatches / Math.max(qWords.length, tWords.length);
 
+  // If one string is a substring of the other and they are reasonably long, boost it
+  if ((t.includes(q) || q.includes(t)) && q.length > 3) {
+    return Math.max(similarity, wordSimilarity, 0.85);
+  }
+
   return Math.max(similarity, wordSimilarity);
 }
 
 async function matchItemsToInventory(parsedItems: ParsedItem[], shopId: string) {
   const inventoryItems = await db.select().from(itemsTable).where(eq(itemsTable.shopId, shopId));
   return parsedItems.map((parsed) => {
-    let bestMatch: { id: string; name: string } | null = null;
+    let bestMatch: { id: string; name: string; unit: string; price: string } | null = null;
     let bestScore = 0;
     for (const inv of inventoryItems) {
       const score = fuzzyMatch(parsed.name, inv.name);
-      if (score > bestScore && score > 0.3) { bestScore = score; bestMatch = { id: inv.id, name: inv.name }; }
+      if (score > bestScore && score > 0.5) {
+        bestScore = score;
+        bestMatch = { id: inv.id, name: inv.name, unit: inv.unit, price: inv.price };
+      }
     }
     return {
       name: parsed.name,
-      quantity: bestMatch ? parsed.quantity : 0, // If no match, empty qty for manual edit
+      quantity: bestMatch ? parsed.quantity : 0,
       unit: parsed.unit,
       matchedItemId: bestMatch?.id ?? null,
       matchedItemName: bestMatch?.name ?? null,
+      matchedItemUnit: bestMatch?.unit ?? null,
+      matchedItemPrice: bestMatch?.price ?? null,
       confidence: Math.round(bestScore * 100) / 100,
     };
   }).filter(item => item.matchedItemId !== null);

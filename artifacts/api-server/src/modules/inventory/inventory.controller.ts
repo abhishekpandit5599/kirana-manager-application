@@ -15,7 +15,7 @@ export const inventoryController = {
   async getItem(req: Request, res: Response, next: NextFunction) {
     try {
       const shop = getShop(req);
-      const item = await inventoryService.getItem(req.params.id, shop.id);
+      const item = await inventoryService.getItem((req.params.id as string), shop.id);
       res.json(item);
     } catch (err) { next(err); }
   },
@@ -31,7 +31,7 @@ export const inventoryController = {
   async updateItem(req: Request, res: Response, next: NextFunction) {
     try {
       const shop = getShop(req);
-      const item = await inventoryService.updateItem(req.params.id, shop.id, req.body);
+      const item = await inventoryService.updateItem((req.params.id as string), shop.id, req.body);
       res.json(item);
     } catch (err) { next(err); }
   },
@@ -39,7 +39,7 @@ export const inventoryController = {
   async deleteItem(req: Request, res: Response, next: NextFunction) {
     try {
       const shop = getShop(req);
-      await inventoryService.deleteItem(req.params.id, shop.id);
+      await inventoryService.deleteItem((req.params.id as string), shop.id);
       res.sendStatus(204);
     } catch (err) { next(err); }
   },

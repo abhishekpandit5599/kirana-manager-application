@@ -20,7 +20,7 @@ export const invoiceController = {
   async getInvoice(req: Request, res: Response, next: NextFunction) {
     try {
       const shop = getShop(req);
-      const result = await invoiceService.getInvoice(req.params.id, shop.id, getBaseUrl(req));
+      const result = await invoiceService.getInvoice((req.params.id as string), shop.id, getBaseUrl(req));
       res.json(result);
     } catch (err) { next(err); }
   },
@@ -36,7 +36,7 @@ export const invoiceController = {
   async getInvoicePdf(req: Request, res: Response, next: NextFunction) {
     try {
       const shop = getShop(req);
-      const pdfBuffer = await invoiceService.getInvoicePdf(req.params.id, shop.id, shop);
+      const pdfBuffer = await invoiceService.getInvoicePdf((req.params.id as string), shop.id, shop);
       res.set({
         "Content-Type": "application/pdf",
         "Content-Disposition": `inline; filename="invoice.pdf"`,
@@ -48,7 +48,7 @@ export const invoiceController = {
 
   async getPublicInvoicePdf(req: Request, res: Response, next: NextFunction) {
     try {
-      const pdfBuffer = await invoiceService.getPublicInvoicePdf(req.params.id);
+      const pdfBuffer = await invoiceService.getPublicInvoicePdf((req.params.id as string));
       res.set({
         "Content-Type": "application/pdf",
         "Content-Disposition": `inline; filename="invoice.pdf"`,
@@ -61,7 +61,7 @@ export const invoiceController = {
   async getInvoiceExcel(req: Request, res: Response, next: NextFunction) {
     try {
       const shop = getShop(req);
-      const wb = await invoiceService.getInvoiceExcel(req.params.id, shop.id);
+      const wb = await invoiceService.getInvoiceExcel((req.params.id as string), shop.id);
       res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
       res.setHeader("Content-Disposition", 'attachment; filename="invoice.xlsx"');
       await wb.xlsx.write(res);

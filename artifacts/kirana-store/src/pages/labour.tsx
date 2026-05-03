@@ -63,8 +63,8 @@ export default function Labour() {
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editingLabourId, setEditingLabourId] = useState<number | null>(null);
-  const [selectedLabourForSalary, setSelectedLabourForSalary] = useState<number | null>(null);
+  const [editingLabourId, setEditingLabourId] = useState<string | null>(null);
+  const [selectedLabourForSalary, setSelectedLabourForSalary] = useState<string | null>(null);
 
   const [viewDate, setViewDate] = useState(new Date());
   const currentMonthStr = format(viewDate, 'yyyy-MM');
@@ -75,13 +75,13 @@ export default function Labour() {
 
   const { data: attendanceData, isLoading: attendanceLoading } = useListAttendance(
     { month: currentMonthStr },
-    { query: { enabled: true } }
+    { }
   );
 
   const { data: salaryData, isLoading: salaryLoading } = useGetLabourSalary(
-    selectedLabourForSalary || 0,
+    selectedLabourForSalary || "",
     { month: currentMonthStr } as any,
-    { query: { enabled: !!selectedLabourForSalary } }
+    { query: { enabled: !!selectedLabourForSalary, queryKey: ["salary", selectedLabourForSalary, currentMonthStr] as const } }
   );
 
   const createLabour = useCreateLabour();
@@ -128,7 +128,7 @@ export default function Labour() {
     });
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     deleteLabour.mutate({ id }, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListLabourQueryKey() });
@@ -138,7 +138,7 @@ export default function Labour() {
     });
   };
 
-  const handleMarkAttendance = (labourId: number, date: string, status: "present" | "absent" | "half") => {
+  const handleMarkAttendance = (labourId: string, date: string, status: "present" | "absent" | "half") => {
     markAttendance.mutate({ data: { labourId, date, status } }, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListAttendanceQueryKey({ month: currentMonthStr }) });
@@ -148,11 +148,11 @@ export default function Labour() {
     });
   };
 
-  const getStatus = (labourId: number, dateStr: string) => {
+  const getStatus = (labourId: string, dateStr: string) => {
     return attendanceData?.find(a => a.labourId === labourId && a.date.startsWith(dateStr))?.status;
   };
 
-  const getTodayStatus = (labourId: number) => getStatus(labourId, todayStr);
+  const getTodayStatus = (labourId: string) => getStatus(labourId, todayStr);
 
   const isCurrentMonth = format(viewDate, 'yyyy-MM') === format(new Date(), 'yyyy-MM');
 

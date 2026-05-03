@@ -117,7 +117,7 @@ export const inventoryService = {
 
   async importExcel(shopId: string, buffer: Buffer, mode: "create" | "update") {
     const wb = new ExcelJS.Workbook();
-    await wb.xlsx.load(buffer);
+    await wb.xlsx.load(buffer as any);
     const ws = wb.getWorksheet("Inventory") ?? wb.worksheets[0];
     if (!ws) throw new AppError(400, "No worksheet found in Excel file");
 

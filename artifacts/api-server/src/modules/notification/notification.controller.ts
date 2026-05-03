@@ -13,6 +13,6 @@ export const notificationController = {
     } catch (err) { next(err); }
   },
   async markRead(req: Request, res: Response, next: NextFunction) {
-    try { res.json(await notificationService.markAsRead(req.params.id, getShop(req).id)); } catch (err) { next(err); }
+    try { res.json(await notificationService.markAsRead((req.params.id as string), getShop(req).id)); } catch (err) { next(err); }
   },
 };

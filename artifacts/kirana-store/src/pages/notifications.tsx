@@ -26,7 +26,7 @@ export default function Notifications() {
   const { data: notifications, isLoading } = useListNotifications();
   const markRead = useMarkNotificationRead();
 
-  const handleMarkRead = (id: number) => {
+  const handleMarkRead = (id: string) => {
     markRead.mutate({ id }, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListNotificationsQueryKey() });

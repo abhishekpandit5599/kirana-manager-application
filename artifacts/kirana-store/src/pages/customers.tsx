@@ -30,7 +30,7 @@ const API_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 function getAuthHeader() {
   const token = localStorage.getItem("kirana_token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  return token ? { Authorization: `Bearer ${token}` } : ({} as Record<string, string>);
 }
 
 async function apiFetch(path: string, options?: RequestInit) {

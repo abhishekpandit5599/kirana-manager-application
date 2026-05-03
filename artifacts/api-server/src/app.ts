@@ -2,6 +2,7 @@ import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import path from "path";
+import fs from "fs";
 import router from "./routes";
 import { logger } from "./utils/logger";
 import { errorMiddleware } from "./middlewares/error.middleware";
@@ -40,5 +41,18 @@ app.use("/api", router);
 
 // Global error handler (must be after routes)
 app.use(errorMiddleware);
+
+// Serve frontend in production (must be after API routes)
+const frontendPath = path.resolve(process.cwd(), "../kirana-store/dist/public");
+if (fs.existsSync(frontendPath)) {
+  app.use(express.static(frontendPath));
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/api/")) {
+      res.status(404).json({ message: "Not found" });
+    } else {
+      res.sendFile(path.resolve(frontendPath, "index.html"));
+    }
+  });
+}
 
 export default app;

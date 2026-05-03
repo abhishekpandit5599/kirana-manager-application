@@ -59,7 +59,7 @@ export default function Inventory() {
   
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editingItemId, setEditingItemId] = useState<number | null>(null);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [importMode, setImportMode] = useState<"create" | "update">("create");
@@ -132,7 +132,7 @@ export default function Inventory() {
     });
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     deleteItem.mutate({ id }, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListItemsQueryKey() });

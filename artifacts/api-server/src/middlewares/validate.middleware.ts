@@ -1,0 +1,23 @@
+import { Request, Response, NextFunction } from "express";
+import { ZodSchema } from "zod/v4";
+
+type ValidationTarget = "body" | "query" | "params";
+
+export function validate(schema: ZodSchema, target: ValidationTarget = "body") {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const result = schema.safeParse(req[target]);
+    if (!result.success) {
+      res.status(400).json({
+        error: "Validation failed",
+        details: result.error.issues.map((issue) => ({
+          path: issue.path.join("."),
+          message: issue.message,
+        })),
+      });
+      return;
+    }
+    // Replace parsed data (coerced/transformed values)
+    (req as any)[target] = result.data;
+    next();
+  };
+}

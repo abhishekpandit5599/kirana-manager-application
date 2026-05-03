@@ -1,0 +1,204 @@
+Build a full-stack AI-powered web application for small shop owners (kirana stores) in India.
+
+Tech Stack:
+
+* Frontend: React.js (with Tailwind CSS)
+* Backend: Node.js with Express.js
+* Database: MongoDB
+* AI Microservice: Python (FastAPI)
+
+---
+
+CORE FEATURES:
+
+1. Authentication:
+
+* Simple login/signup using JWT
+* Store shop details
+
+---
+
+2. Inventory Management:
+
+* Add, edit, delete items
+* Fields: name, category, price, stock quantity, unit (kg, pcs, litre)
+* Preloaded default items list (common kirana items in India)
+* Low stock detection (threshold system)
+
+---
+
+3. Billing / Invoice System:
+
+* Create invoice manually (select items + quantity)
+* Auto total calculation
+* Payment method: Cash / UPI (QR code display)
+* Save invoice history with timestamp
+
+---
+
+4. AI FEATURE 1: OCR (SCAN PAPER → INVOICE ITEMS)
+
+* User opens camera and uploads/takes image of handwritten or printed list
+
+* Send image to Python FastAPI service
+
+* Use Tesseract OCR to extract text
+
+* Parse text into structured format:
+  Example input:
+  "Sugar 2kg
+  Rice 5 kg
+  Oil 1 litre"
+
+* Convert into:
+  [
+  {name: "Sugar", quantity: 2, unit: "kg"},
+  {name: "Rice", quantity: 5, unit: "kg"},
+  {name: "Oil", quantity: 1, unit: "litre"}
+  ]
+
+* Match extracted items with inventory:
+
+  * If item exists → auto add to invoice
+  * If not → suggest closest match (fuzzy search)
+
+---
+
+5. AI FEATURE 2: VOICE INPUT → INVOICE
+
+* Add microphone button in UI
+
+* Record voice (Hindi + English mix)
+
+* Send audio to backend
+
+* Use speech-to-text (Google Speech API or open-source alternative)
+
+* Example voice:
+  "2 kilo chawal, 1 litre tel, 3 biscuit"
+
+* Convert into structured JSON
+
+* Map to inventory and auto-add to invoice
+
+---
+
+6. Labour Management:
+
+* Add labour (name, salary per month)
+* Daily attendance marking
+* Auto salary calculation based on attendance
+
+---
+
+7. Dashboard & Analytics:
+
+* Daily sales
+* Monthly sales
+* Profit estimation
+* Low stock alerts
+* Labour salary summary
+
+---
+
+8. Notifications (Mock + Extendable):
+
+* Store notification logs (simulate WhatsApp)
+* Design system so it can integrate with WhatsApp Business API later
+
+---
+
+ARCHITECTURE:
+
+* React frontend (mobile-first UI)
+* Node.js handles:
+
+  * Auth
+  * Inventory
+  * Billing
+  * Labour
+* Python FastAPI handles:
+
+  * OCR processing
+  * Voice processing
+* MongoDB stores all data
+
+---
+
+DATABASE DESIGN (MongoDB Collections):
+
+Users
+Inventory
+Invoices
+Labour
+Attendance
+Notifications
+
+---
+
+API ENDPOINTS:
+
+Auth:
+POST /api/auth/register
+POST /api/auth/login
+
+Inventory:
+GET /api/items
+POST /api/items
+PUT /api/items/:id
+DELETE /api/items/:id
+
+Invoice:
+POST /api/invoice
+GET /api/invoice
+
+AI:
+POST /api/ocr (image upload)
+POST /api/voice (audio upload)
+
+Labour:
+POST /api/labour
+POST /api/attendance
+
+---
+
+UI REQUIREMENTS:
+
+* Simple and fast (for non-tech users)
+* Mobile-first design
+* Hindi + English toggle
+* बड़े बटन (large buttons for easy use)
+
+---
+
+EXTRA INTELLIGENCE:
+
+* Fuzzy matching for item names (e.g., "chawal" → "rice")
+* Unit normalization (kg, kilo, ltr, litre)
+* Error handling for unclear OCR/voice
+
+---
+
+DELIVERABLES:
+
+Generate:
+
+1. Full folder structure
+2. Backend (Node.js) code
+3. Python FastAPI AI service
+4. MongoDB schemas
+5. React frontend components
+6. Sample UI
+7. API integration examples
+
+---
+
+GOAL:
+
+The app should allow a shopkeeper to:
+
+* Scan a handwritten list → auto-create invoice
+* Speak items → auto-create invoice
+* Manage inventory and sales easily
+
+Focus on clean, modular, production-ready code.

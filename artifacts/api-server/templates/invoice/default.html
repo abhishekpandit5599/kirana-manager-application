@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Invoice</title>
+
+<style>
+@page { margin: 2cm 2cm 3cm 2cm; }
+
+body {
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  color: #333;
+  margin: 0;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.header-left { width: 60%; }
+
+.logo {
+  height: 50px;
+  margin-bottom: 8px;
+}
+
+.company-info { line-height: 1.4; }
+
+.invoice-meta { text-align: right; }
+
+.invoice-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.recipient { margin-bottom: 20px; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+th, td {
+  border-top: 1px solid #ddd;
+  padding: 6px;
+}
+
+th {
+  background: #f5f5f5;
+  text-align: left;
+}
+
+.totals {
+  width: 40%;
+  float: right;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <img class="logo" src="{{logoUrl || ""}}" />
+
+    <div class="company-info">
+      <strong>{{shopName}}</strong><br/>
+      {{shopAddress || ""}}<br/>
+      {{shopPhone ? `Phone: ${shopPhone}` : ""}}
+    </div>
+  </div>
+
+  <div class="invoice-meta">
+    <div class="invoice-title">INVOICE</div>
+    <div><strong>No:</strong> {{invoiceNumber}}</div>
+    <div><strong>Date:</strong> {{createdAt}}</div>
+    <div><strong>Payment:</strong> {{paymentMethod}}</div>
+  </div>
+</div>
+
+<!-- CUSTOMER -->
+<div class="recipient">
+  <strong>Bill To:</strong><br/>
+  {{customerName || "Customer"}}<br/>
+  {{customerPhone || ""}}
+</div>
+
+<!-- ITEMS -->
+<table>
+  <thead>
+    <tr>
+      <th style="width:5%">#</th>
+      <th>Description</th>
+      <th style="width:10%; text-align:right;">Qty</th>
+      <th style="width:15%; text-align:right;">Price</th>
+      <th style="width:15%; text-align:right;">Amount</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {{items}}
+  </tbody>
+</table>
+
+<!-- TOTAL -->
+<div class="totals">
+  <table>
+    <tr>
+      <td><strong>Total:</strong></td>
+      <td style="text-align:right;">
+        <strong>₹{{total}}</strong>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- FOOTER -->
+<div style="clear:both; text-align:center; margin-top:50px;">
+  Thank you for your purchase!<br/>
+  <strong>{{shopName}}</strong>
+</div>
+
+</body>
+</html>

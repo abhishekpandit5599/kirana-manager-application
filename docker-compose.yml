@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kirana-store-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kirana
+      POSTGRES_PASSWORD: kirana_pass
+      POSTGRES_DB: kirana_store
+    ports:
+      - "5432:5432"
+    volumes:
+      - kirana_pg_data:/var/lib/postgresql/data
+
+volumes:
+  kirana_pg_data:

@@ -1,0 +1,1150 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.2.0
+  description: Kirana Store Manager API — Multi-tenant SaaS
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentication
+  - name: inventory
+    description: Inventory management
+  - name: invoices
+    description: Invoice/billing
+  - name: customers
+    description: Customer management
+  - name: labour
+    description: Labour management
+  - name: attendance
+    description: Attendance management
+  - name: notifications
+    description: Notifications
+  - name: analytics
+    description: Analytics and dashboard
+  - name: ai
+    description: AI features (OCR/Voice)
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: registerUser
+      tags: [auth]
+      summary: Register a new shop owner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterBody"
+      responses:
+        "201":
+          description: Registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Bad request
+
+  /auth/login:
+    post:
+      operationId: loginUser
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Unauthorized
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /items:
+    get:
+      operationId: listItems
+      tags: [inventory]
+      summary: List all inventory items
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: lowStock
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Item"
+    post:
+      operationId: createItem
+      tags: [inventory]
+      summary: Create a new inventory item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateItemBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+
+  /items/{id}:
+    get:
+      operationId: getItem
+      tags: [inventory]
+      summary: Get item by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateItem
+      tags: [inventory]
+      summary: Update an inventory item
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateItemBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+    delete:
+      operationId: deleteItem
+      tags: [inventory]
+      summary: Delete an inventory item
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /items/seed-defaults:
+    post:
+      operationId: seedDefaultItems
+      tags: [inventory]
+      summary: Seed default kirana items for the store
+      responses:
+        "200":
+          description: Seeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeedResult"
+
+  /invoices:
+    get:
+      operationId: listInvoices
+      tags: [invoices]
+      summary: List all invoices
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+        - in: query
+          name: endDate
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of invoices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Invoice"
+    post:
+      operationId: createInvoice
+      tags: [invoices]
+      summary: Create a new invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateInvoiceBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+
+  /invoices/{id}:
+    get:
+      operationId: getInvoice
+      tags: [invoices]
+      summary: Get invoice by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Invoice
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+        "404":
+          description: Not found
+
+  /invoices/{id}/pdf:
+    get:
+      operationId: getInvoicePdf
+      tags: [invoices]
+      summary: Download invoice PDF
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: PDF file
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+  /customers:
+    get:
+      operationId: listCustomers
+      tags: [customers]
+      summary: List all customers
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Customer"
+    post:
+      operationId: createCustomer
+      tags: [customers]
+      summary: Create a new customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCustomerBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+
+  /customers/{id}:
+    get:
+      operationId: getCustomer
+      tags: [customers]
+      summary: Get customer by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Customer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateCustomer
+      tags: [customers]
+      summary: Update a customer
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCustomerBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+    delete:
+      operationId: deleteCustomer
+      tags: [customers]
+      summary: Delete a customer
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /labour:
+    get:
+      operationId: listLabour
+      tags: [labour]
+      summary: List all labour
+      responses:
+        "200":
+          description: List of labour
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Labour"
+    post:
+      operationId: createLabour
+      tags: [labour]
+      summary: Add a new labour
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLabourBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Labour"
+
+  /labour/{id}:
+    get:
+      operationId: getLabour
+      tags: [labour]
+      summary: Get labour by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Labour
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Labour"
+    patch:
+      operationId: updateLabour
+      tags: [labour]
+      summary: Update labour
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLabourBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Labour"
+    delete:
+      operationId: deleteLabour
+      tags: [labour]
+      summary: Delete labour
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /attendance:
+    get:
+      operationId: listAttendance
+      tags: [attendance]
+      summary: List attendance records
+      parameters:
+        - in: query
+          name: labourId
+          schema:
+            type: string
+        - in: query
+          name: month
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Attendance records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Attendance"
+    post:
+      operationId: markAttendance
+      tags: [attendance]
+      summary: Mark attendance for a labour
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarkAttendanceBody"
+      responses:
+        "201":
+          description: Marked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Attendance"
+
+  /labour/{id}/salary:
+    get:
+      operationId: getLabourSalary
+      tags: [labour]
+      summary: Get calculated salary for a labour member
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: month
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Salary calculation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SalaryCalculation"
+
+  /notifications:
+    get:
+      operationId: listNotifications
+      tags: [notifications]
+      summary: List notifications
+      responses:
+        "200":
+          description: Notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+    post:
+      operationId: createNotification
+      tags: [notifications]
+      summary: Create a notification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateNotificationBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+
+  /notifications/{id}/read:
+    patch:
+      operationId: markNotificationRead
+      tags: [notifications]
+      summary: Mark notification as read
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+
+  /analytics/dashboard:
+    get:
+      operationId: getDashboard
+      tags: [analytics]
+      summary: Get dashboard summary
+      responses:
+        "200":
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /analytics/sales:
+    get:
+      operationId: getSalesAnalytics
+      tags: [analytics]
+      summary: Get sales analytics
+      parameters:
+        - in: query
+          name: period
+          schema:
+            type: string
+            enum: [daily, weekly, monthly]
+      responses:
+        "200":
+          description: Sales data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SalesDataPoint"
+
+  /analytics/top-items:
+    get:
+      operationId: getTopItems
+      tags: [analytics]
+      summary: Get top selling items
+      responses:
+        "200":
+          description: Top items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TopItem"
+
+  /ai/ocr:
+    post:
+      operationId: processOcr
+      tags: [ai]
+      summary: Process image with OCR to extract invoice items
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OcrRequest"
+      responses:
+        "200":
+          description: Extracted items
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiExtractResponse"
+
+  /ai/voice:
+    post:
+      operationId: processVoice
+      tags: [ai]
+      summary: Process voice/text input to extract invoice items
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VoiceRequest"
+      responses:
+        "200":
+          description: Extracted items
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiExtractResponse"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    RegisterBody:
+      type: object
+      properties:
+        name:
+          type: string
+        shopName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        phone:
+          type: string
+      required: [name, shopName, email, password]
+
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required: [email, password]
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+      required: [token, user]
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        shopName:
+          type: string
+        shopId:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required: [id, name, shopName, shopId, email, createdAt]
+
+    Item:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+        stock:
+          type: number
+        unit:
+          type: string
+          enum: [kg, pcs, litre, gm, ml, dozen, pack]
+        lowStockThreshold:
+          type: number
+        isLowStock:
+          type: boolean
+        createdAt:
+          type: string
+      required: [id, name, category, price, stock, unit, lowStockThreshold, isLowStock, createdAt]
+
+    CreateItemBody:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+        stock:
+          type: number
+        unit:
+          type: string
+          enum: [kg, pcs, litre, gm, ml, dozen, pack]
+        lowStockThreshold:
+          type: number
+      required: [name, category, price, stock, unit]
+
+    UpdateItemBody:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+        stock:
+          type: number
+        unit:
+          type: string
+          enum: [kg, pcs, litre, gm, ml, dozen, pack]
+        lowStockThreshold:
+          type: number
+
+    SeedResult:
+      type: object
+      properties:
+        seeded:
+          type: integer
+        message:
+          type: string
+      required: [seeded, message]
+
+    InvoiceItem:
+      type: object
+      properties:
+        itemId:
+          type: string
+        itemName:
+          type: string
+        quantity:
+          type: number
+        unit:
+          type: string
+        price:
+          type: number
+        total:
+          type: number
+      required: [itemId, itemName, quantity, unit, price, total]
+
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: string
+        invoiceNumber:
+          type: string
+        customerName:
+          type: ["string", "null"]
+        customerPhone:
+          type: ["string", "null"]
+        customerId:
+          type: ["string", "null"]
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/InvoiceItem"
+        subtotal:
+          type: number
+        total:
+          type: number
+        paymentMethod:
+          type: string
+          enum: [cash, upi]
+        status:
+          type: string
+          enum: [paid, unpaid]
+        pdfUrl:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required: [id, invoiceNumber, items, subtotal, total, paymentMethod, status, createdAt]
+
+    CreateInvoiceBody:
+      type: object
+      properties:
+        customerName:
+          type: ["string", "null"]
+        customerPhone:
+          type: ["string", "null"]
+        customerId:
+          type: ["string", "null"]
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              itemId:
+                type: string
+              quantity:
+                type: number
+            required: [itemId, quantity]
+        paymentMethod:
+          type: string
+          enum: [cash, upi]
+        status:
+          type: string
+          enum: [paid, unpaid]
+      required: [items, paymentMethod]
+
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required: [id, name, createdAt]
+
+    CreateCustomerBody:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+      required: [name]
+
+    UpdateCustomerBody:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+
+    Labour:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        role:
+          type: ["string", "null"]
+        salaryPerMonth:
+          type: number
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+      required: [id, name, salaryPerMonth, isActive, createdAt]
+
+    CreateLabourBody:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        role:
+          type: ["string", "null"]
+        salaryPerMonth:
+          type: number
+      required: [name, salaryPerMonth]
+
+    UpdateLabourBody:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        role:
+          type: ["string", "null"]
+        salaryPerMonth:
+          type: number
+        isActive:
+          type: boolean
+
+    Attendance:
+      type: object
+      properties:
+        id:
+          type: string
+        labourId:
+          type: string
+        labourName:
+          type: string
+        date:
+          type: string
+        status:
+          type: string
+          enum: [present, absent, half]
+        createdAt:
+          type: string
+      required: [id, labourId, labourName, date, status, createdAt]
+
+    MarkAttendanceBody:
+      type: object
+      properties:
+        labourId:
+          type: string
+        date:
+          type: string
+        status:
+          type: string
+          enum: [present, absent, half]
+      required: [labourId, date, status]
+
+    SalaryCalculation:
+      type: object
+      properties:
+        labourId:
+          type: string
+        labourName:
+          type: string
+        month:
+          type: string
+        totalDays:
+          type: integer
+        presentDays:
+          type: integer
+        halfDays:
+          type: integer
+        absentDays:
+          type: integer
+        baseSalary:
+          type: number
+        calculatedSalary:
+          type: number
+      required: [labourId, labourName, month, totalDays, presentDays, halfDays, absentDays, baseSalary, calculatedSalary]
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [low_stock, invoice, salary, system]
+        title:
+          type: string
+        message:
+          type: string
+        isRead:
+          type: boolean
+        createdAt:
+          type: string
+      required: [id, type, title, message, isRead, createdAt]
+
+    CreateNotificationBody:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [low_stock, invoice, salary, system]
+        title:
+          type: string
+        message:
+          type: string
+      required: [type, title, message]
+
+    DashboardSummary:
+      type: object
+      properties:
+        todaySales:
+          type: number
+        todayInvoices:
+          type: integer
+        monthlySales:
+          type: number
+        monthlyInvoices:
+          type: integer
+        totalItems:
+          type: integer
+        lowStockCount:
+          type: integer
+        totalLabour:
+          type: integer
+        estimatedProfit:
+          type: number
+        unreadNotifications:
+          type: integer
+        totalCustomers:
+          type: integer
+      required: [todaySales, todayInvoices, monthlySales, monthlyInvoices, totalItems, lowStockCount, totalLabour, estimatedProfit, unreadNotifications, totalCustomers]
+
+    SalesDataPoint:
+      type: object
+      properties:
+        date:
+          type: string
+        sales:
+          type: number
+        invoices:
+          type: integer
+      required: [date, sales, invoices]
+
+    TopItem:
+      type: object
+      properties:
+        itemId:
+          type: string
+        itemName:
+          type: string
+        totalQuantitySold:
+          type: number
+        totalRevenue:
+          type: number
+      required: [itemId, itemName, totalQuantitySold, totalRevenue]
+
+    AiExtractedItem:
+      type: object
+      properties:
+        name:
+          type: string
+        quantity:
+          type: number
+        unit:
+          type: string
+        matchedItemId:
+          type: ["string", "null"]
+        matchedItemName:
+          type: ["string", "null"]
+        confidence:
+          type: number
+      required: [name, quantity, unit, confidence]
+
+    AiExtractResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/AiExtractedItem"
+        rawText:
+          type: string
+        success:
+          type: boolean
+      required: [items, rawText, success]
+
+    OcrRequest:
+      type: object
+      properties:
+        imageBase64:
+          type: string
+      required: [imageBase64]
+
+    VoiceRequest:
+      type: object
+      properties:
+        text:
+          type: string
+      required: [text]

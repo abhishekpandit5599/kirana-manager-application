@@ -24,15 +24,26 @@ export interface InvoiceForPdf {
 export function generateInvoiceHtml(invoice: InvoiceForPdf): Record<string, string> {
   const items = (invoice.items || [])
     .map(
-      (item, i) => `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${item.itemName}</td>
-        <td>${item.quantity}</td>
-        <td>₹${item.price.toFixed(2)}</td>
-        <td>₹${item.total.toFixed(2)}</td>
-      </tr>
-    `
+      (item, i) => {
+        const q = item.quantity;
+        const u = item.unit.toLowerCase();
+        let displayQtyStr = `${parseFloat(q.toFixed(3))} ${item.unit}`;
+        
+        if (q < 1 && q > 0) {
+          if (u === 'kg') displayQtyStr = `${Math.round(q * 1000)} gm`;
+          else if (u === 'litre' || u === 'ltr' || u === 'liter') displayQtyStr = `${Math.round(q * 1000)} ml`;
+        }
+
+        return `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${item.itemName}</td>
+            <td>${displayQtyStr}</td>
+            <td>₹${item.price.toFixed(2)}</td>
+            <td>₹${item.total.toFixed(2)}</td>
+          </tr>
+        `;
+      }
     )
     .join("");
 

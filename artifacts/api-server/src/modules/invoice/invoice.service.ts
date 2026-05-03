@@ -153,8 +153,11 @@ export const invoiceService = {
       customerName: invoice.customerName,
       customerPhone: invoice.customerPhone,
       items: (invoice.items as any[]).map((item: any) => ({
-        itemName: item.itemName, quantity: item.quantity, unit: item.unit,
-        price: item.price, total: item.total,
+        itemName: item.itemName, 
+        quantity: Math.round(parseFloat(item.quantity) * 1000) / 1000, 
+        unit: item.unit,
+        price: Math.round(parseFloat(item.price) * 100) / 100, 
+        total: Math.round(parseFloat(item.total) * 100) / 100,
       })),
       subtotal: parseFloat(invoice.subtotal),
       total: parseFloat(invoice.total),
@@ -178,8 +181,11 @@ export const invoiceService = {
       customerName: invoice.customerName,
       customerPhone: invoice.customerPhone,
       items: (invoice.items as any[]).map((item: any) => ({
-        itemName: item.itemName, quantity: item.quantity, unit: item.unit,
-        price: item.price, total: item.total,
+        itemName: item.itemName, 
+        quantity: Math.round(parseFloat(item.quantity) * 1000) / 1000, 
+        unit: item.unit,
+        price: Math.round(parseFloat(item.price) * 100) / 100, 
+        total: Math.round(parseFloat(item.total) * 100) / 100,
       })),
       subtotal: parseFloat(invoice.subtotal),
       total: parseFloat(invoice.total),
@@ -202,10 +208,31 @@ export const invoiceService = {
       { header: "Total", key: "total", width: 12 },
     ];
     for (const item of invoice.items as any[]) {
-      ws.addRow(item);
+      const q = parseFloat(item.quantity);
+      const u = item.unit.toLowerCase();
+      let displayQty: string | number = Math.round(q * 1000) / 1000;
+      let displayUnit = item.unit;
+
+      if (q < 1 && q > 0) {
+        if (u === 'kg') {
+          displayQty = Math.round(q * 1000);
+          displayUnit = 'gm';
+        } else if (u === 'litre' || u === 'ltr' || u === 'liter') {
+          displayQty = Math.round(q * 1000);
+          displayUnit = 'ml';
+        }
+      }
+
+      ws.addRow({
+        itemName: item.itemName,
+        quantity: displayQty,
+        unit: displayUnit,
+        price: Math.round(parseFloat(item.price) * 100) / 100,
+        total: Math.round(parseFloat(item.total) * 100) / 100
+      });
     }
     ws.addRow({});
-    ws.addRow({ itemName: "TOTAL", total: parseFloat(invoice.total) });
+    ws.addRow({ itemName: "TOTAL", total: Math.round(parseFloat(invoice.total) * 100) / 100 });
     return wb;
   },
 };

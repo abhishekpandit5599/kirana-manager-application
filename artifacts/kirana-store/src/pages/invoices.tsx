@@ -42,6 +42,16 @@ interface Invoice {
   createdAt: string;
 }
 
+const formatQuantity = (quantity: number | string, unit: string) => {
+  const q = parseFloat(quantity.toString());
+  const u = unit.toLowerCase();
+  if (q < 1 && q > 0) {
+    if (u === 'kg') return `${Math.round(q * 1000)} gm`;
+    if (u === 'litre' || u === 'ltr' || u === 'liter') return `${Math.round(q * 1000)} ml`;
+  }
+  return `${parseFloat(q.toFixed(3))} ${unit}`;
+};
+
 function getHeaders(): Record<string, string> {
   const token = localStorage.getItem("kirana_token");
   const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -259,9 +269,11 @@ export default function Invoices() {
                       <div key={i} className="flex justify-between items-center text-sm border-b pb-2 last:border-0">
                         <div className="flex-1">
                           <p className="font-medium text-base">{item.itemName}</p>
-                          <p className="text-muted-foreground">{item.quantity} {item.unit} x ₹{item.price}</p>
+                          <p className="text-muted-foreground">
+                            {formatQuantity(item.quantity, item.unit)} x ₹{parseFloat(item.price.toString()).toFixed(2)}
+                          </p>
                         </div>
-                        <div className="font-bold text-base">₹{item.total}</div>
+                        <div className="font-bold text-base">₹{parseFloat(item.total.toString()).toFixed(2)}</div>
                       </div>
                     ))}
                   </div>
@@ -270,7 +282,7 @@ export default function Invoices() {
                 <div className="border-t pt-4">
                   <div className="flex justify-between items-center text-xl font-bold">
                     <span>{t("Total Amount", "कुल राशि")}</span>
-                    <span className="text-primary">₹{selectedInvoice.total}</span>
+                    <span className="text-primary">₹{parseFloat(selectedInvoice.total.toString()).toFixed(2)}</span>
                   </div>
                 </div>
 

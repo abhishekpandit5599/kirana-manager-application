@@ -17,6 +17,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Search,
   Plus,
   Minus,
@@ -31,7 +38,41 @@ import { Item } from "@workspace/api-client-react";
 
 interface CartItem extends Item {
   cartQuantity: number;
+  displayUnit: string;
 }
+
+const UNIT_OPTIONS: Record<string, string[]> = {
+  kg: ["kg", "gm"],
+  gm: ["kg", "gm"],
+  litre: ["litre", "ml"],
+  liter: ["litre", "ml"],
+  ltr: ["ltr", "ml"],
+  ml: ["ltr", "ml"],
+  pcs: ["pcs"],
+  pc: ["pcs"],
+  pack: ["pack"],
+  packet: ["packet"],
+  box: ["box"],
+  nos: ["nos"],
+  dozen: ["dozen"],
+};
+
+const convertQuantity = (quantity: number, fromUnit: string, toUnit: string): number => {
+  const from = fromUnit.toLowerCase();
+  const to = toUnit.toLowerCase();
+  
+  if (from === to) return quantity;
+  
+  // Weights
+  if (from === "kg" && (to === "gm" || to === "gram")) return quantity * 1000;
+  if ((from === "gm" || from === "gram") && to === "kg") return quantity / 1000;
+  
+  // Volumes
+  if ((from === "litre" || from === "liter" || from === "ltr") && to === "ml") return quantity * 1000;
+  if (from === "ml" && (to === "litre" || to === "liter" || to === "ltr")) return quantity / 1000;
+
+  return quantity;
+};
 
 export default function Billing() {
   const { t } = useLanguage();
@@ -69,7 +110,7 @@ export default function Billing() {
       if (existing) {
         return prev.map(i => i.id === item.id ? { ...i, cartQuantity: i.cartQuantity + 1 } : i);
       }
-      return [...prev, { ...item, cartQuantity: 1 }];
+      return [...prev, { ...item, cartQuantity: 1, displayUnit: item.unit }];
     });
   };
 
@@ -84,16 +125,32 @@ export default function Billing() {
   };
 
   const setQuantityDirect = (id: string, val: string) => {
-    const n = parseInt(val, 10);
-    if (isNaN(n) || n < 1) return;
-    setCart(prev => prev.map(item => item.id === id ? { ...item, cartQuantity: n } : item));
+    const n = parseFloat(val);
+    if (isNaN(n) || n < 0) return;
+    setCart(prev => prev.map(item => {
+      if (item.id === id) {
+        // Convert from display unit back to inventory base unit
+        const internalQty = convertQuantity(n, item.displayUnit, item.unit);
+        return { ...item, cartQuantity: internalQty };
+      }
+      return item;
+    }));
+  };
+
+  const changeUnit = (id: string, newUnit: string) => {
+    setCart(prev => prev.map(item => {
+      if (item.id === id) {
+        return { ...item, displayUnit: newUnit };
+      }
+      return item;
+    }));
   };
 
   const removeFromCart = (id: string) => {
     setCart(prev => prev.filter(item => item.id !== id));
   };
 
-  const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.cartQuantity), 0);
+  const cartTotal = Math.round(cart.reduce((sum, item) => sum + (item.price * item.cartQuantity), 0) * 100) / 100;
 
   // Fetch UPI QR when payment method is UPI and cart has items
   useEffect(() => {
@@ -116,7 +173,13 @@ export default function Billing() {
         if (aiItem.matchedItemId) {
           const matchedAPIItem = items.find(i => i.id === aiItem.matchedItemId);
           if (matchedAPIItem) {
-            itemsToAdd.push({ ...matchedAPIItem, cartQuantity: aiItem.quantity });
+            // Internal quantity is always in inventory unit
+            const internalQty = convertQuantity(aiItem.quantity, aiItem.unit, matchedAPIItem.unit);
+            itemsToAdd.push({ 
+              ...matchedAPIItem, 
+              cartQuantity: internalQty,
+              displayUnit: aiItem.unit // Show the unit as extracted by AI
+            });
           }
         }
       });
@@ -125,9 +188,12 @@ export default function Billing() {
         setCart(prev => {
           const newCart = [...prev];
           itemsToAdd.forEach(newItem => {
-            const existing = newCart.find(c => c.id === newItem.id);
-            if (existing) {
-              existing.cartQuantity += newItem.cartQuantity;
+            const existingIndex = newCart.findIndex(c => c.id === newItem.id);
+            if (existingIndex > -1) {
+              newCart[existingIndex] = { 
+                ...newCart[existingIndex], 
+                cartQuantity: newCart[existingIndex].cartQuantity + newItem.cartQuantity 
+              };
             } else {
               newCart.push(newItem);
             }
@@ -238,7 +304,7 @@ export default function Billing() {
                     </div>
                     {inCart && (
                       <div className="mt-1.5">
-                        <Badge className="text-xs px-1.5 py-0 h-4 bg-primary">×{inCart.cartQuantity}</Badge>
+                        <Badge className="text-xs px-1.5 py-0 h-4 bg-primary">×{parseFloat(inCart.cartQuantity.toFixed(3))}</Badge>
                       </div>
                     )}
                   </button>
@@ -295,40 +361,58 @@ export default function Billing() {
               {/* Invoice header row */}
               <div className="px-3 py-1.5 bg-muted/40 border-b flex text-xs font-semibold text-muted-foreground">
                 <span className="flex-1">{t("Item", "सामान")}</span>
-                <span className="w-24 text-center">{t("Qty", "मात्रा")}</span>
+                <span className="w-16 text-center">{t("Qty", "मात्रा")}</span>
+                <span className="w-20 text-center">{t("Unit", "इकाई")}</span>
                 <span className="w-16 text-right">{t("Amount", "राशि")}</span>
                 <span className="w-6"></span>
               </div>
               <div className="divide-y">
-                {cart.map((item, idx) => (
-                  <div key={item.id} className="px-3 py-2 flex items-center gap-1 hover:bg-muted/20 text-sm">
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium truncate">{item.name}</div>
-                      <div className="text-xs text-muted-foreground">₹{item.price}/{item.unit}</div>
-                    </div>
-                    <div className="w-24 flex items-center justify-center gap-0.5">
-                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.id, -1)}>
-                        <Minus className="h-3 w-3" />
+                {cart.map((item, idx) => {
+                  const displayQty = Math.round(convertQuantity(item.cartQuantity, item.unit, item.displayUnit) * 1000) / 1000;
+                  const unitOptions = UNIT_OPTIONS[item.unit.toLowerCase()] || [item.unit];
+                  
+                  return (
+                    <div key={item.id} className="px-3 py-2 flex items-center gap-1 hover:bg-muted/20 text-sm">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium truncate">{item.name}</div>
+                        <div className="text-xs text-muted-foreground">₹{item.price}/{item.unit}</div>
+                      </div>
+                      
+                      {/* Quantity Input */}
+                      <div className="w-16 flex items-center justify-center">
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={displayQty}
+                          onChange={e => setQuantityDirect(item.id, e.target.value)}
+                          className="w-14 text-center text-sm font-bold bg-transparent border-b border-border outline-none focus:border-primary"
+                        />
+                      </div>
+
+                      {/* Unit Selection Dropdown */}
+                      <div className="w-20">
+                        <Select value={item.displayUnit} onValueChange={(val) => changeUnit(item.id, val)}>
+                          <SelectTrigger className="h-7 px-1 text-[11px] border-none bg-muted/50 hover:bg-muted focus:ring-0">
+                            <SelectValue placeholder="Unit" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {unitOptions.map(u => (
+                              <SelectItem key={u} value={u} className="text-xs">{u}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="w-16 text-right font-semibold">
+                        ₹{(item.price * item.cartQuantity).toFixed(2)}
+                      </div>
+                      <Button variant="ghost" size="icon" className="w-6 h-6 text-destructive hover:bg-destructive/10" onClick={() => removeFromCart(item.id)}>
+                        <Trash2 className="h-3 w-3" />
                       </Button>
-                      <input
-                        type="number"
-                        min="1"
-                        value={item.cartQuantity}
-                        onChange={e => setQuantityDirect(item.id, e.target.value)}
-                        className="w-8 text-center text-sm font-bold bg-transparent border-b border-border outline-none"
-                      />
-                      <Button variant="ghost" size="icon" className="h-6 w-6 text-primary" onClick={() => updateQuantity(item.id, 1)}>
-                        <Plus className="h-3 w-3" />
-                      </Button>
                     </div>
-                    <div className="w-16 text-right font-semibold">
-                      ₹{item.price * item.cartQuantity}
-                    </div>
-                    <Button variant="ghost" size="icon" className="w-6 h-6 text-destructive hover:bg-destructive/10" onClick={() => removeFromCart(item.id)}>
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </>
           )}
@@ -339,7 +423,7 @@ export default function Billing() {
           {/* Total */}
           <div className="w-full flex justify-between items-center">
             <span className="text-sm text-muted-foreground font-medium">{t("Total", "कुल राशि")}</span>
-            <span className="text-2xl font-bold text-primary">₹{cartTotal}</span>
+            <span className="text-2xl font-bold text-primary">₹{cartTotal.toFixed(2)}</span>
           </div>
 
           {/* Payment method inline */}

@@ -114,6 +114,13 @@ export const invoiceService = {
 
     // Send WhatsApp invoice in background
     if (data.customerPhone) {
+      // Normalize phone (add 91 if 10 digits, remove + if present)
+      const normalizedPhone = data.customerPhone.startsWith("+")
+        ? data.customerPhone.replace("+", "")
+        : data.customerPhone.length === 10
+        ? `91${data.customerPhone}`
+        : data.customerPhone;
+
       const customer = await customerRepository.findByPhone(shopId, data.customerPhone);
       if(!customer){
         await customerService.createCustomer(shopId, {
@@ -122,7 +129,7 @@ export const invoiceService = {
         }); 
       }
       sendWhatsAppTemplate({
-        to: data.customerPhone,
+        to: normalizedPhone,
         templateName: "invoice_sent",
         params: [
           shopName,

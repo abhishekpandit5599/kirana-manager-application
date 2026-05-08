@@ -39,7 +39,7 @@ export default function Login() {
         onSuccess: (res) => {
           setToken(res.token);
           toast({ title: t("Welcome back!", "वापसी पर स्वागत है!") });
-          setLocation("/");
+          setLocation("/dashboard");
         },
         onError: (err) => {
           toast({ 

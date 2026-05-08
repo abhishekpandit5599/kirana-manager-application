@@ -68,7 +68,7 @@ export function Layout({ children }: LayoutProps) {
   }, [settings.themeColor]);
 
   const navigation = [
-    { name: t("Dashboard", "डैशबोर्ड"), href: "/", icon: LayoutDashboard },
+    { name: t("Dashboard", "डैशबोर्ड"), href: "/dashboard", icon: LayoutDashboard },
     { name: t("Inventory", "सामान"), href: "/inventory", icon: Package },
     { name: t("Billing", "बिलिंग"), href: "/billing", icon: Receipt },
     { name: t("Invoices", "रसीद"), href: "/invoices", icon: History },

@@ -42,7 +42,7 @@ export default function Register() {
         onSuccess: (res) => {
           setToken(res.token);
           toast({ title: t("Registration successful!", "पंजीकरण सफल!") });
-          setLocation("/");
+          setLocation("/dashboard");
         },
         onError: (err) => {
           toast({ 

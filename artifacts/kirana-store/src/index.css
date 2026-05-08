@@ -1,4 +1,21 @@
 @import "tailwindcss";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply text-slate-900 antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
@@ -81,7 +98,7 @@
 
   --border: 214 18% 88%;
   --input: 214 18% 88%;
-  --ring: 221 83% 53%;
+  --ring: 160 84% 35%;
 
   --card: 0 0% 100%;
   --card-foreground: 222 25% 12%;
@@ -91,7 +108,7 @@
   --popover-foreground: 222 25% 12%;
   --popover-border: 214 18% 90%;
 
-  --primary: 221 83% 53%;
+  --primary: 160 84% 35%;
   --primary-foreground: 0 0% 100%;
 
   --secondary: 142 68% 40%;
@@ -109,13 +126,13 @@
   --sidebar: 0 0% 100%;
   --sidebar-foreground: 222 25% 12%;
   --sidebar-border: 214 18% 88%;
-  --sidebar-primary: 221 83% 53%;
+  --sidebar-primary: 160 84% 35%;
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 214 20% 94%;
   --sidebar-accent-foreground: 222 25% 12%;
-  --sidebar-ring: 221 83% 53%;
+  --sidebar-ring: 160 84% 35%;
 
-  --chart-1: 221 83% 53%;
+  --chart-1: 160 84% 35%;
   --chart-2: 142 68% 40%;
   --chart-3: 199 89% 48%;
   --chart-4: 43 100% 50%;
@@ -149,7 +166,7 @@
 
   --border: 221 20% 20%;
   --input: 221 20% 20%;
-  --ring: 221 83% 53%;
+  --ring: 160 84% 45%;
 
   --card: 222 25% 14%;
   --card-foreground: 214 32% 95%;
@@ -159,7 +176,7 @@
   --popover-foreground: 214 32% 95%;
   --popover-border: 221 20% 20%;
 
-  --primary: 221 83% 58%;
+  --primary: 160 84% 45%;
   --primary-foreground: 0 0% 100%;
 
   --secondary: 142 68% 42%;
@@ -177,13 +194,13 @@
   --sidebar: 222 25% 14%;
   --sidebar-foreground: 214 32% 95%;
   --sidebar-border: 221 20% 20%;
-  --sidebar-primary: 221 83% 58%;
+  --sidebar-primary: 160 84% 45%;
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 221 20% 20%;
   --sidebar-accent-foreground: 214 32% 95%;
-  --sidebar-ring: 221 83% 58%;
+  --sidebar-ring: 160 84% 45%;
 
-  --chart-1: 221 83% 58%;
+  --chart-1: 160 84% 45%;
   --chart-2: 142 68% 42%;
   --chart-3: 199 89% 48%;
   --chart-4: 43 100% 50%;

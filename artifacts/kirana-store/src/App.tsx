@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Layout } from "@/components/layout";
 import { setAuthTokenGetter } from "@workspace/api-client-react";
 
+import LandingPage from "@/pages/landing-page";
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
@@ -45,7 +46,7 @@ function ProtectedRoutes() {
   return (
     <Layout>
       <Switch>
-        <Route path="/" component={Dashboard} />
+        <Route path="/dashboard" component={Dashboard} />
         <Route path="/inventory" component={Inventory} />
         <Route path="/inventory/defaults" component={DefaultItems} />
         <Route path="/billing" component={Billing} />
@@ -66,6 +67,7 @@ function Router() {
   return (
     <Switch>
       {/* Public routes */}
+      <Route path="/" component={LandingPage} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/forgot-password" component={ForgotPassword} />

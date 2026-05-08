@@ -13,7 +13,7 @@ export interface SettingsState {
 const initialState: SettingsState = {
   shopName: "",
   upiId: "",
-  themeColor: "#1e40af",
+  themeColor: "#10b981",
   ownerWhatsapp: "",
   logoUrl: null,
   loading: false,
@@ -40,7 +40,7 @@ const settingsSlice = createSlice({
       state.loading = false;
       state.shopName = action.payload.shopName || "";
       state.upiId = action.payload.upiId || "";
-      state.themeColor = action.payload.themeColor || "#1e40af";
+      state.themeColor = action.payload.themeColor || "#10b981";
       state.ownerWhatsapp = action.payload.ownerWhatsapp || "";
       state.logoUrl = action.payload.logoUrl || null;
     });

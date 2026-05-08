@@ -137,9 +137,9 @@ export const invoiceService = {
           invoice.invoiceNumber,
           total.toString(),
           new Date(invoice.createdAt).toLocaleDateString("en-IN"),
-          data.paymentMethod,
-          pdfUrl, // if template includes link
+          data.paymentMethod
         ],
+        buttonParam: invoice.id
       }).catch((err) => {
         console.error("WhatsApp send failed:", err);
       });

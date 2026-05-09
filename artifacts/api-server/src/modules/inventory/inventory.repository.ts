@@ -1,9 +1,33 @@
 import { db, itemsTable, defaultItemsTable } from "@workspace/db";
-import { eq, and, ilike } from "drizzle-orm";
+import { eq, and, ilike, or, desc } from "drizzle-orm";
 
 export const inventoryRepository = {
-  async findAllByShop(shopId: string) {
-    return db.select().from(itemsTable).where(eq(itemsTable.shopId, shopId));
+  async findAllByShop(shopId: string, filters: any = {}, pagination: { limit: number; offset: number } = { limit: 20, offset: 0 }) {
+    const conditions = [eq(itemsTable.shopId, shopId)];
+
+    if (filters.category && filters.category !== "all") {
+      conditions.push(eq(itemsTable.category, filters.category));
+    }
+    if (filters.q) {
+      const search = `%${filters.q}%`;
+      const searchCols = [
+        ilike(itemsTable.name, search),
+        ilike(itemsTable.category, search)
+      ].filter((c): c is any => c !== undefined);
+      
+      if (searchCols.length > 0) {
+        conditions.push(or(...searchCols)!);
+      }
+    }
+
+    let query = db.select()
+      .from(itemsTable)
+      .where(and(...conditions))
+      .orderBy(desc(itemsTable.createdAt))
+      .limit(pagination.limit)
+      .offset(pagination.offset);
+
+    return query;
   },
 
   async findById(id: string, shopId: string) {
@@ -41,12 +65,43 @@ export const inventoryRepository = {
   },
 
   // Default items catalog
-  async getAllDefaultItems() {
-    return db.select().from(defaultItemsTable);
+  async getAllDefaultItems(filters: any = {}, pagination: { limit: number; offset: number } = { limit: 20, offset: 0 }) {
+    const conditions = [];
+
+    if (filters.q) {
+      const search = `%${filters.q}%`;
+      const searchCols = [
+        ilike(defaultItemsTable.name, search),
+        ilike(defaultItemsTable.category, search)
+      ].filter((c): c is any => c !== undefined);
+      
+      if (searchCols.length > 0) {
+        conditions.push(or(...searchCols)!);
+      }
+    }
+
+    return db.select()
+      .from(defaultItemsTable)
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
+      .limit(pagination.limit)
+      .offset(pagination.offset);
   },
 
   async seedDefaultItems(items: { name: string; category: string; price: string; unit: string }[]) {
     if (items.length === 0) return;
     await db.insert(defaultItemsTable).values(items).onConflictDoNothing();
+  },
+
+  async getUniqueCategories(shopId: string) {
+    const results = await db.selectDistinct({ category: itemsTable.category })
+      .from(itemsTable)
+      .where(eq(itemsTable.shopId, shopId));
+    return results.map(r => r.category).filter(Boolean);
+  },
+
+  async getDefaultCategories() {
+    const results = await db.selectDistinct({ category: defaultItemsTable.category })
+      .from(defaultItemsTable);
+    return results.map(r => r.category).filter(Boolean);
   },
 };

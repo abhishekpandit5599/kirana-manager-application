@@ -19,13 +19,17 @@ function formatItem(item: any) {
 }
 
 export const inventoryService = {
-  async listItems(shopId: string, category?: string, lowStock?: string) {
-    let items = await inventoryRepository.findAllByShop(shopId);
-    if (category) {
-      items = items.filter((i) => i.category.toLowerCase() === category.toLowerCase());
-    }
+  async listItems(shopId: string, query: any) {
+    const limit = Math.min(parseInt(query.limit) || 20, 100);
+    const offset = parseInt(query.offset) || 0;
+    
+    let items = await inventoryRepository.findAllByShop(shopId, query, { limit, offset });
+    
     const formatted = items.map(formatItem);
-    if (lowStock === "true") return formatted.filter((i) => i.isLowStock);
+    
+    // lowStock filter is still applied in-memory if needed, or we could move it to repo.
+    // For consistency with current logic:
+    if (query.lowStock === "true") return formatted.filter((i) => i.isLowStock);
     return formatted;
   },
 
@@ -68,8 +72,11 @@ export const inventoryService = {
   },
 
   // Default items
-  async getDefaultItems() {
-    const items = await inventoryRepository.getAllDefaultItems();
+  async getDefaultItems(query: any) {
+    const limit = Math.min(parseInt(query.limit) || 20, 100);
+    const offset = parseInt(query.offset) || 0;
+    
+    const items = await inventoryRepository.getAllDefaultItems(query, { limit, offset });
     return items.map((i) => ({
       id: i.id,
       name: i.name,
@@ -193,5 +200,13 @@ export const inventoryService = {
     headerRow.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1E40AF" } };
     headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
     return wb;
+  },
+
+  async getCategories(shopId: string) {
+    return inventoryRepository.getUniqueCategories(shopId);
+  },
+
+  async getDefaultCategories() {
+    return inventoryRepository.getDefaultCategories();
   },
 };

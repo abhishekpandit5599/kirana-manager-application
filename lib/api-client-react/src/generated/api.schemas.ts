@@ -390,28 +390,71 @@ export interface VoiceRequest {
 export type ListItemsParams = {
   category?: string;
   lowStock?: string;
+  q?: string;
+  limit?: number;
+  offset?: number;
+};
+
+export type GetDefaultItemsParams = {
+  q?: string;
+  category?: string;
+  limit?: number;
+  offset?: number;
 };
 
 export type ListInvoicesParams = {
   startDate?: string;
   endDate?: string;
+  paymentMethod?: ListInvoicesPaymentMethod;
+  minAmount?: number;
+  maxAmount?: number;
+  q?: string;
+  limit?: number;
+  offset?: number;
 };
 
+export type ListInvoicesPaymentMethod =
+  (typeof ListInvoicesPaymentMethod)[keyof typeof ListInvoicesPaymentMethod];
+
+export const ListInvoicesPaymentMethod = {
+  cash: "cash",
+  upi: "upi",
+} as const;
+
 export type ListCustomersParams = {
-  search?: string;
+  q?: string;
+  limit?: number;
+  offset?: number;
+};
+
+export type ListLabourParams = {
+  q?: string;
+  limit?: number;
+  offset?: number;
 };
 
 export type ListAttendanceParams = {
   labourId?: string;
   month?: string;
+  limit?: number;
+  offset?: number;
 };
 
 export type GetLabourSalaryParams = {
   month?: string;
+  limit?: number;
+  offset?: number;
+};
+
+export type ListNotificationsParams = {
+  limit?: number;
+  offset?: number;
 };
 
 export type GetSalesAnalyticsParams = {
   period?: GetSalesAnalyticsPeriod;
+  limit?: number;
+  offset?: number;
 };
 
 export type GetSalesAnalyticsPeriod =

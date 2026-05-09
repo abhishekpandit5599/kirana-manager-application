@@ -62,9 +62,15 @@ export const GetMeResponse = zod.object({
 /**
  * @summary List all inventory items
  */
+export const listItemsQueryLimitDefault = 20;
+export const listItemsQueryOffsetDefault = 0;
+
 export const ListItemsQueryParams = zod.object({
   category: zod.coerce.string().optional(),
   lowStock: zod.coerce.string().optional(),
+  q: zod.coerce.string().optional(),
+  limit: zod.coerce.number().default(listItemsQueryLimitDefault),
+  offset: zod.coerce.number().default(listItemsQueryOffsetDefault),
 });
 
 export const ListItemsResponseItem = zod.object({
@@ -157,11 +163,46 @@ export const SeedDefaultItemsResponse = zod.object({
 });
 
 /**
+ * @summary Get default items catalog
+ */
+export const getDefaultItemsQueryLimitDefault = 20;
+export const getDefaultItemsQueryOffsetDefault = 0;
+
+export const GetDefaultItemsQueryParams = zod.object({
+  q: zod.coerce.string().optional(),
+  category: zod.coerce.string().optional(),
+  limit: zod.coerce.number().default(getDefaultItemsQueryLimitDefault),
+  offset: zod.coerce.number().default(getDefaultItemsQueryOffsetDefault),
+});
+
+export const GetDefaultItemsResponseItem = zod.object({
+  id: zod.string(),
+  name: zod.string(),
+  category: zod.string(),
+  price: zod.number(),
+  stock: zod.number(),
+  unit: zod.enum(["kg", "pcs", "litre", "gm", "ml", "dozen", "pack"]),
+  lowStockThreshold: zod.number(),
+  isLowStock: zod.boolean(),
+  createdAt: zod.string(),
+});
+export const GetDefaultItemsResponse = zod.array(GetDefaultItemsResponseItem);
+
+/**
  * @summary List all invoices
  */
+export const listInvoicesQueryLimitDefault = 20;
+export const listInvoicesQueryOffsetDefault = 0;
+
 export const ListInvoicesQueryParams = zod.object({
   startDate: zod.coerce.string().optional(),
   endDate: zod.coerce.string().optional(),
+  paymentMethod: zod.enum(["cash", "upi"]).optional(),
+  minAmount: zod.coerce.number().optional(),
+  maxAmount: zod.coerce.number().optional(),
+  q: zod.coerce.string().optional(),
+  limit: zod.coerce.number().default(listInvoicesQueryLimitDefault),
+  offset: zod.coerce.number().default(listInvoicesQueryOffsetDefault),
 });
 
 export const ListInvoicesResponseItem = zod.object({
@@ -247,8 +288,13 @@ export const GetInvoicePdfParams = zod.object({
 /**
  * @summary List all customers
  */
+export const listCustomersQueryLimitDefault = 20;
+export const listCustomersQueryOffsetDefault = 0;
+
 export const ListCustomersQueryParams = zod.object({
-  search: zod.coerce.string().optional(),
+  q: zod.coerce.string().optional(),
+  limit: zod.coerce.number().default(listCustomersQueryLimitDefault),
+  offset: zod.coerce.number().default(listCustomersQueryOffsetDefault),
 });
 
 export const ListCustomersResponseItem = zod.object({
@@ -325,6 +371,15 @@ export const DeleteCustomerParams = zod.object({
 /**
  * @summary List all labour
  */
+export const listLabourQueryLimitDefault = 20;
+export const listLabourQueryOffsetDefault = 0;
+
+export const ListLabourQueryParams = zod.object({
+  q: zod.coerce.string().optional(),
+  limit: zod.coerce.number().default(listLabourQueryLimitDefault),
+  offset: zod.coerce.number().default(listLabourQueryOffsetDefault),
+});
+
 export const ListLabourResponseItem = zod.object({
   id: zod.string(),
   name: zod.string(),
@@ -398,9 +453,14 @@ export const DeleteLabourParams = zod.object({
 /**
  * @summary List attendance records
  */
+export const listAttendanceQueryLimitDefault = 20;
+export const listAttendanceQueryOffsetDefault = 0;
+
 export const ListAttendanceQueryParams = zod.object({
   labourId: zod.coerce.string().optional(),
   month: zod.coerce.string().optional(),
+  limit: zod.coerce.number().default(listAttendanceQueryLimitDefault),
+  offset: zod.coerce.number().default(listAttendanceQueryOffsetDefault),
 });
 
 export const ListAttendanceResponseItem = zod.object({
@@ -429,8 +489,13 @@ export const GetLabourSalaryParams = zod.object({
   id: zod.coerce.string(),
 });
 
+export const getLabourSalaryQueryLimitDefault = 20;
+export const getLabourSalaryQueryOffsetDefault = 0;
+
 export const GetLabourSalaryQueryParams = zod.object({
   month: zod.coerce.string().optional(),
+  limit: zod.coerce.number().default(getLabourSalaryQueryLimitDefault),
+  offset: zod.coerce.number().default(getLabourSalaryQueryOffsetDefault),
 });
 
 export const GetLabourSalaryResponse = zod.object({
@@ -448,6 +513,14 @@ export const GetLabourSalaryResponse = zod.object({
 /**
  * @summary List notifications
  */
+export const listNotificationsQueryLimitDefault = 20;
+export const listNotificationsQueryOffsetDefault = 0;
+
+export const ListNotificationsQueryParams = zod.object({
+  limit: zod.coerce.number().default(listNotificationsQueryLimitDefault),
+  offset: zod.coerce.number().default(listNotificationsQueryOffsetDefault),
+});
+
 export const ListNotificationsResponseItem = zod.object({
   id: zod.string(),
   type: zod.enum(["low_stock", "invoice", "salary", "system"]),
@@ -504,8 +577,13 @@ export const GetDashboardResponse = zod.object({
 /**
  * @summary Get sales analytics
  */
+export const getSalesAnalyticsQueryLimitDefault = 20;
+export const getSalesAnalyticsQueryOffsetDefault = 0;
+
 export const GetSalesAnalyticsQueryParams = zod.object({
   period: zod.enum(["daily", "weekly", "monthly"]).optional(),
+  limit: zod.coerce.number().default(getSalesAnalyticsQueryLimitDefault),
+  offset: zod.coerce.number().default(getSalesAnalyticsQueryOffsetDefault),
 });
 
 export const GetSalesAnalyticsResponseItem = zod.object({

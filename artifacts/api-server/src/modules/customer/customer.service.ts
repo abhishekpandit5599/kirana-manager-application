@@ -8,14 +8,11 @@ function formatCustomer(c: any) {
 }
 
 export const customerService = {
-  async listCustomers(shopId: string, search?: string) {
-    let customers = await customerRepository.findAllByShop(shopId);
-    if (search) {
-      const q = search.toLowerCase();
-      customers = customers.filter((c) =>
-        c.name.toLowerCase().includes(q) || (c.phone && c.phone.includes(q)) || (c.email && c.email.toLowerCase().includes(q))
-      );
-    }
+  async listCustomers(shopId: string, query: any) {
+    const limit = Math.min(parseInt(query.limit) || 20, 100);
+    const offset = parseInt(query.offset) || 0;
+
+    const customers = await customerRepository.findAllByShop(shopId, query, { limit, offset });
     return customers.map(formatCustomer);
   },
 

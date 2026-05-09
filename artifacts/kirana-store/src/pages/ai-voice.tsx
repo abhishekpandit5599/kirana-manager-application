@@ -19,6 +19,7 @@ import {
 import { useLocation } from "wouter";
 import { useDispatch } from "react-redux";
 import { setAiExtractedItems } from "@/store/slices/billingSlice";
+import { processVoice } from "@/lib/api";
 
 interface ExtractedItem {
   name: string;
@@ -29,12 +30,6 @@ interface ExtractedItem {
   confidence: number;
 }
 
-function getHeaders(): Record<string, string> {
-  const token = localStorage.getItem("kirana_token");
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  return headers;
-}
 
 // Check for Speech Recognition API
 const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -117,15 +112,9 @@ export default function AiVoice() {
     if (!text.trim()) return;
     setIsProcessing(true);
     try {
-      const res = await fetch("/api/ai/voice", {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify({ text }),
-      });
-      if (!res.ok) throw new Error("Failed to process voice");
-      const data = await res.json();
+      const data = await processVoice(text);
       
-      if (data.success && data.items.length > 0) {
+      if (data && data.items && data.items.length > 0) {
         setExtractedItems(data.items);
         toast({ title: t("Voice processed successfully!", "आवाज़ सफलतापूर्वक प्रोसेस की गई!") });
       } else {
@@ -153,7 +142,7 @@ export default function AiVoice() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">

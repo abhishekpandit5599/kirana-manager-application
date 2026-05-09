@@ -1,0 +1,33 @@
+export const SUCCESS_MESSAGES = {
+  FETCHED: (resource: string) => `${resource} fetched successfully`,
+  CREATED: (resource: string) => `${resource} created successfully`,
+  UPDATED: (resource: string) => `${resource} updated successfully`,
+  DELETED: (resource: string) => `${resource} deleted successfully`,
+  LOGIN: "Login successful",
+  LOGOUT: "Logged out successfully",
+  ATTENDANCE_MARKED: "Attendance marked successfully",
+  SETTLEMENT_DONE: "Salary settlement completed",
+  OTP_SENT: "OTP sent successfully",
+  OTP_VERIFIED: "OTP verified successfully",
+  REGISTRATION_SUCCESS: "Registration successful",
+  PASSWORD_RESET_SENT: "Password reset instructions sent",
+  PASSWORD_RESET_SUCCESS: "Password reset successful",
+  MARKED_READ: "Notification marked as read",
+  ALL_MARKED_READ: "All notifications marked as read",
+  LOGO_UPLOADED: "Logo uploaded successfully",
+  UPI_QR_UPLOADED: "UPI QR uploaded successfully",
+  UPI_QR_GENERATED: "UPI QR generated successfully",
+  OCR_COMPLETED: "OCR processing completed",
+  VOICE_PROCESSED: "Voice command processed",
+};
+
+export const ERROR_MESSAGES = {
+  NOT_FOUND: (resource: string) => `${resource} not found`,
+  UNAUTHORIZED: "Unauthorized access",
+  VALIDATION_FAILED: "Validation failed",
+  INTERNAL_SERVER_ERROR: "An internal server error occurred",
+  ALREADY_EXISTS: (resource: string) => `${resource} already exists`,
+  INVALID_CREDENTIALS: "Invalid username or password",
+  NO_FILE_UPLOADED: "No file uploaded",
+  UPI_ID_NOT_CONFIGURED: "UPI ID not configured",
+};

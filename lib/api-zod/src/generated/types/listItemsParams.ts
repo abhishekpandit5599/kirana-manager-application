@@ -9,4 +9,7 @@
 export type ListItemsParams = {
   category?: string;
   lowStock?: string;
+  q?: string;
+  limit?: number;
+  offset?: number;
 };

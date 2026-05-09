@@ -83,7 +83,7 @@ export default function Settings() {
   if (loading) return <div className="h-[60vh] flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6 max-w-2xl pt-6">
       <div><h1 className="text-xl font-bold flex items-center gap-2"><SettingsIcon className="h-5 w-5" />{t("Settings","सेटिंग्स")}</h1><p className="text-sm text-muted-foreground">{t("Configure your shop preferences","दुकान की प्राथमिकताएं कॉन्फ़िगर करें")}</p></div>
 
       <Card>
@@ -110,7 +110,7 @@ export default function Settings() {
               )}
             </div>
           </div>
-          <div><Label>{t("Theme Color","थीम रंग")}</Label><div className="flex items-center gap-2 mt-1"><input type="color" value={themeColor} onChange={e => setThemeColor(e.target.value)} className="w-10 h-10 rounded cursor-pointer" /><Input value={themeColor} onChange={e => setThemeColor(e.target.value)} className="w-32" /></div></div>
+          {/* <div><Label>{t("Theme Color","थीम रंग")}</Label><div className="flex items-center gap-2 mt-1"><input type="color" value={themeColor} onChange={e => setThemeColor(e.target.value)} className="w-10 h-10 rounded cursor-pointer" /><Input value={themeColor} onChange={e => setThemeColor(e.target.value)} className="w-32" /></div></div> */}
         </CardContent>
       </Card>
 

@@ -3,15 +3,14 @@ import { useLanguage } from "@/hooks/use-language";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import {
-  useListItems,
   useCreateInvoice,
   getListItemsQueryKey
 } from "@workspace/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { clearAiExtractedItems } from "@/store/slices/billingSlice";
-import { getUpiQr } from "@/lib/api";
+import { getUpiQr, handleResponse } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +34,8 @@ import {
   Loader2
 } from "lucide-react";
 import { Item } from "@workspace/api-client-react";
+import { ErrorState } from "@/components/error-state";
+import { useInView } from "react-intersection-observer";
 
 interface CartItem extends Item {
   cartQuantity: number;
@@ -81,8 +82,10 @@ export default function Billing() {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const aiExtractedItems = useSelector((state: RootState) => state.billing.aiExtractedItems);
+  const { ref, inView } = useInView();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -92,17 +95,44 @@ export default function Billing() {
   const [upiQrData, setUpiQrData] = useState<string | null>(null);
   const [upiLoading, setUpiLoading] = useState(false);
 
-  const { data: items, isLoading: itemsLoading } = useListItems();
-  const createInvoice = useCreateInvoice();
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-  const filteredItems = useMemo(() => {
-    if (!items) return [];
-    if (!searchTerm) return items;
-    return items.filter(item =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [items, searchTerm]);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: itemsLoading,
+    isError,
+    error,
+    refetch
+  } = useInfiniteQuery({
+    queryKey: ['/api/items', debouncedSearch],
+    queryFn: async ({ pageParam = 0 }) => {
+      const res = await fetch(`/api/items?offset=${pageParam}&limit=20&q=${encodeURIComponent(debouncedSearch)}`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem("kirana_token")}` }
+      });
+      return handleResponse(res);
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.length === 20 ? allPages.length * 20 : undefined;
+    },
+  });
+
+  const items = data?.pages.flat() || [];
+
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, fetchNextPage, hasNextPage]);
+
+  const createInvoice = useCreateInvoice();
 
   const addToCart = (item: Item) => {
     setCart(prev => {
@@ -129,7 +159,6 @@ export default function Billing() {
     if (isNaN(n) || n < 0) return;
     setCart(prev => prev.map(item => {
       if (item.id === id) {
-        // Convert from display unit back to inventory base unit
         const internalQty = convertQuantity(n, item.displayUnit, item.unit);
         return { ...item, cartQuantity: internalQty };
       }
@@ -152,7 +181,6 @@ export default function Billing() {
 
   const cartTotal = Math.round(cart.reduce((sum, item) => sum + (item.price * item.cartQuantity), 0) * 100) / 100;
 
-  // Fetch UPI QR when payment method is UPI and cart has items
   useEffect(() => {
     if (paymentMethod === "upi" && cart.length > 0 && cartTotal > 0) {
       setUpiLoading(true);
@@ -165,7 +193,6 @@ export default function Billing() {
     }
   }, [paymentMethod, cartTotal, cart.length]);
 
-  // Handle AI Extracted Items auto-select
   useEffect(() => {
     if (items && items.length > 0 && aiExtractedItems && aiExtractedItems.length > 0) {
       const itemsToAdd: CartItem[] = [];
@@ -173,12 +200,11 @@ export default function Billing() {
         if (aiItem.matchedItemId) {
           const matchedAPIItem = items.find(i => i.id === aiItem.matchedItemId);
           if (matchedAPIItem) {
-            // Internal quantity is always in inventory unit
             const internalQty = convertQuantity(aiItem.quantity, aiItem.unit, matchedAPIItem.unit);
             itemsToAdd.push({ 
               ...matchedAPIItem, 
               cartQuantity: internalQty,
-              displayUnit: aiItem.unit // Show the unit as extracted by AI
+              displayUnit: aiItem.unit
             });
           }
         }
@@ -202,12 +228,10 @@ export default function Billing() {
         });
         toast({ title: t("AI Items added to bill!", "AI सामान बिल में जोड़े गए!") });
       }
-      
       dispatch(clearAiExtractedItems());
     }
   }, [items, aiExtractedItems, dispatch, t, toast]);
 
-  // Customer cross-validation
   const validateCustomer = (): boolean => {
     if (customerName && !customerPhone) {
       setCustomerError(t("Phone number is required when name is provided", "नाम दिए जाने पर फ़ोन नंबर ज़रूरी है"));
@@ -264,36 +288,45 @@ export default function Billing() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-120px)] min-h-[600px]">
+    <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-110px)] md:h-[calc(100vh-140px)] min-h-[600px] pt-0">
       {/* Left: Item picker */}
       <div className="w-full lg:w-3/5 flex flex-col gap-3 h-full">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold">{t("New Invoice", "नया बिल")}</h1>
+        <div className="sticky top-14 md:top-0 z-10 -mx-4 md:-mx-0 px-4 md:px-0 pt-6 pb-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-bold">{t("New Invoice", "नया बिल")}</h1>
+          </div>
+
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-[#cacbcf] transition-colors" />
+            <Input
+              placeholder={t("Search items...", "सामान खोजें...")}
+              className="pl-12 h-10 text-base bg-white border-[#cacbcf] rounded-xl transition-all hover:border-[#cacbcf] focus:border-[#cacbcf]"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
 
-        <div className="relative group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-          <Input
-            placeholder={t("Search items...", "सामान खोजें...")}
-            className="pl-12 h-10 text-base bg-white border-[#cacbcf] rounded-xl transition-all"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <div className="flex-1 overflow-y-auto">
-          {itemsLoading ? (
+        <div className="flex-1 overflow-y-auto pr-1">
+          {itemsLoading && items.length === 0 ? (
             <div className="h-full flex items-center justify-center">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </div>
-          ) : filteredItems.length > 0 ? (
+          ) : isError ? (
+            <div className="h-full flex items-center justify-center p-4">
+              <ErrorState 
+                message={error?.message} 
+                onRetry={() => refetch()} 
+              />
+            </div>
+          ) : items.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {filteredItems.map(item => {
+              {items.map(item => {
                 const inCart = cart.find(c => c.id === item.id);
                 return (
                   <button
                     key={item.id}
-                    className={`rounded-lg border p-3 text-left transition-all hover:shadow-sm active:scale-95 ${inCart ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-[#cacbcf]'}`}
+                    className={`rounded-lg border p-3 text-left transition-all hover:shadow-sm active:scale-95 ${inCart ? 'border-primary bg-primary/5' : 'border-[#cacbcf]/30 bg-card hover:border-[#cacbcf]'}`}
                     onClick={() => addToCart(item)}
                   >
                     <div className="font-semibold text-sm truncate">{item.name}</div>
@@ -310,6 +343,10 @@ export default function Billing() {
                   </button>
                 );
               })}
+              {/* Infinite Scroll Trigger */}
+              <div ref={ref} className="col-span-full py-4 flex justify-center">
+                {isFetchingNextPage && <Loader2 className="h-5 w-5 animate-spin text-primary" />}
+              </div>
             </div>
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
@@ -334,13 +371,13 @@ export default function Billing() {
           </CardTitle>
           <Input
             placeholder={t("Customer Name (optional)", "ग्राहक का नाम (वैकल्पिक)")}
-            className={`h-8 text-sm mt-2 ${customerError && !customerName ? 'border-destructive' : ''}`}
+            className={`h-8 text-sm mt-2 border-[#cacbcf]/50 focus:border-primary ${customerError && !customerName ? 'border-destructive' : ''}`}
             value={customerName}
             onChange={(e) => { setCustomerName(e.target.value); setCustomerError(""); }}
           />
           <Input
             placeholder={t("Phone for WhatsApp invoice (optional)", "WhatsApp बिल के लिए फोन (वैकल्पिक)")}
-            className={`h-8 text-sm mt-1 ${customerError && !customerPhone ? 'border-destructive' : ''}`}
+            className={`h-8 text-sm mt-1 border-[#cacbcf]/50 focus:border-primary ${customerError && !customerPhone ? 'border-destructive' : ''}`}
             value={customerPhone}
             onChange={(e) => { setCustomerPhone(e.target.value); setCustomerError(""); }}
           />
@@ -349,7 +386,6 @@ export default function Billing() {
           )}
         </CardHeader>
 
-        {/* Invoice line items */}
         <CardContent className="flex-1 overflow-y-auto p-0">
           {cart.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-6 text-center">
@@ -358,7 +394,6 @@ export default function Billing() {
             </div>
           ) : (
             <>
-              {/* Invoice header row */}
               <div className="px-3 py-1.5 bg-muted/40 border-b flex text-xs font-semibold text-muted-foreground">
                 <span className="flex-1">{t("Item", "सामान")}</span>
                 <span className="w-16 text-center">{t("Qty", "मात्रा")}</span>
@@ -367,7 +402,7 @@ export default function Billing() {
                 <span className="w-6"></span>
               </div>
               <div className="divide-y">
-                {cart.map((item, idx) => {
+                {cart.map((item) => {
                   const displayQty = Math.round(convertQuantity(item.cartQuantity, item.unit, item.displayUnit) * 1000) / 1000;
                   const unitOptions = UNIT_OPTIONS[item.unit.toLowerCase()] || [item.unit];
                   
@@ -377,8 +412,6 @@ export default function Billing() {
                         <div className="font-medium truncate">{item.name}</div>
                         <div className="text-xs text-muted-foreground">₹{item.price}/{item.unit}</div>
                       </div>
-                      
-                      {/* Quantity Input */}
                       <div className="w-16 flex items-center justify-center">
                         <input
                           type="number"
@@ -389,8 +422,6 @@ export default function Billing() {
                           className="w-14 text-center text-sm font-bold bg-transparent border-b border-border outline-none focus:border-primary"
                         />
                       </div>
-
-                      {/* Unit Selection Dropdown */}
                       <div className="w-20">
                         <Select value={item.displayUnit} onValueChange={(val) => changeUnit(item.id, val)}>
                           <SelectTrigger className="h-7 px-1 text-[11px] border-none bg-muted/50 hover:bg-muted focus:ring-0">
@@ -403,7 +434,6 @@ export default function Billing() {
                           </SelectContent>
                         </Select>
                       </div>
-
                       <div className="w-16 text-right font-semibold">
                         ₹{(item.price * item.cartQuantity).toFixed(2)}
                       </div>
@@ -418,28 +448,24 @@ export default function Billing() {
           )}
         </CardContent>
 
-        {/* Payment + total section - always visible */}
         <CardFooter className="flex-none flex-col border-t bg-muted/10 px-4 py-3 space-y-3">
-          {/* Total */}
           <div className="w-full flex justify-between items-center">
             <span className="text-sm text-muted-foreground font-medium">{t("Total", "कुल राशि")}</span>
             <span className="text-2xl font-bold text-primary">₹{cartTotal.toFixed(2)}</span>
           </div>
-
-          {/* Payment method inline */}
           <div className="w-full">
             <p className="text-xs text-muted-foreground mb-2 font-medium">{t("Payment Method", "भुगतान का तरीका")}</p>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setPaymentMethod("cash")}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-semibold transition-all ${paymentMethod === "cash" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-[#cacbcf]"}`}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-semibold transition-all ${paymentMethod === "cash" ? "border-primary bg-primary/10 text-primary" : "border-[#cacbcf]/50 text-muted-foreground hover:border-[#cacbcf]"}`}
               >
                 <IndianRupee className="h-4 w-4" />
                 {t("Cash", "नकद")}
               </button>
               <button
                 onClick={() => setPaymentMethod("upi")}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-semibold transition-all ${paymentMethod === "upi" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-[#cacbcf]"}`}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-semibold transition-all ${paymentMethod === "upi" ? "border-primary bg-primary/10 text-primary" : "border-[#cacbcf]/50 text-muted-foreground hover:border-[#cacbcf]"}`}
               >
                 <QrCode className="h-4 w-4" />
                 UPI
@@ -447,9 +473,8 @@ export default function Billing() {
             </div>
           </div>
 
-          {/* UPI QR Code */}
           {paymentMethod === "upi" && cart.length > 0 && (
-            <div className="w-full flex flex-col items-center gap-2 p-3 rounded-lg bg-white border">
+            <div className="w-full flex flex-col items-center gap-2 p-3 rounded-lg bg-white border border-[#cacbcf]/30">
               {upiLoading ? (
                 <div className="w-32 h-32 flex items-center justify-center">
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -473,7 +498,7 @@ export default function Billing() {
           )}
 
           <Button
-            className="w-full h-10 font-bold text-sm"
+            className="w-full h-10 font-bold text-sm bg-primary hover:bg-primary/90 border-none"
             disabled={cart.length === 0 || createInvoice.isPending}
             onClick={submitInvoice}
           >

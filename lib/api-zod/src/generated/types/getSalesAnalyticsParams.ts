@@ -9,4 +9,6 @@ import type { GetSalesAnalyticsPeriod } from "./getSalesAnalyticsPeriod";
 
 export type GetSalesAnalyticsParams = {
   period?: GetSalesAnalyticsPeriod;
+  limit?: number;
+  offset?: number;
 };

@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { invoiceService } from "./invoice.service";
 import { getShop } from "../../middlewares/auth.middleware";
+import { sendSuccess } from "../../utils/response";
+import { SUCCESS_MESSAGES } from "../../utils/messages";
 
 function getBaseUrl(req: Request): string {
   const host = req.headers["x-forwarded-host"] || req.get("host") || "localhost";
@@ -13,7 +15,7 @@ export const invoiceController = {
     try {
       const shop = getShop(req);
       const result = await invoiceService.listInvoices(shop.id, req.query, getBaseUrl(req));
-      res.json(result);
+      sendSuccess(res, result, SUCCESS_MESSAGES.FETCHED("Invoices"));
     } catch (err) { next(err); }
   },
 
@@ -21,7 +23,7 @@ export const invoiceController = {
     try {
       const shop = getShop(req);
       const result = await invoiceService.getInvoice((req.params.id as string), shop.id, getBaseUrl(req));
-      res.json(result);
+      sendSuccess(res, result, SUCCESS_MESSAGES.FETCHED("Invoice"));
     } catch (err) { next(err); }
   },
 
@@ -29,7 +31,7 @@ export const invoiceController = {
     try {
       const shop = getShop(req);
       const result = await invoiceService.createInvoice(shop.id, req.body, getBaseUrl(req), shop.name);
-      res.status(201).json(result);
+      sendSuccess(res, result, "Invoice created successfully", 201);
     } catch (err) { next(err); }
   },
 

@@ -7,5 +7,7 @@
  */
 
 export type ListCustomersParams = {
-  search?: string;
+  q?: string;
+  limit?: number;
+  offset?: number;
 };

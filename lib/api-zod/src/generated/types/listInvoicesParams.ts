@@ -5,8 +5,15 @@
  * Kirana Store Manager API — Multi-tenant SaaS
  * OpenAPI spec version: 0.2.0
  */
+import type { ListInvoicesPaymentMethod } from "./listInvoicesPaymentMethod";
 
 export type ListInvoicesParams = {
   startDate?: string;
   endDate?: string;
+  paymentMethod?: ListInvoicesPaymentMethod;
+  minAmount?: number;
+  maxAmount?: number;
+  q?: string;
+  limit?: number;
+  offset?: number;
 };

@@ -6,8 +6,10 @@ function formatNotification(n: any) {
 }
 
 export const notificationService = {
-  async listNotifications(shopId: string) {
-    const notifications = await notificationRepository.findAllByShop(shopId);
+  async listNotifications(shopId: string, query: any) {
+    const limit = Math.min(parseInt(query.limit) || 20, 100);
+    const offset = parseInt(query.offset) || 0;
+    const notifications = await notificationRepository.findAllByShop(shopId, { limit, offset });
     return notifications.map(formatNotification);
   },
 
@@ -20,6 +22,10 @@ export const notificationService = {
     const n = await notificationRepository.markRead(id, shopId);
     if (!n) throw new AppError(404, "Notification not found");
     return formatNotification(n);
+  },
+
+  async markAllAsRead(shopId: string) {
+    await notificationRepository.markAllReadByShop(shopId);
   },
 
   // Auto-generated notifications

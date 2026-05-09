@@ -110,6 +110,20 @@ paths:
           name: lowStock
           schema:
             type: string
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
       responses:
         "200":
           description: List of items
@@ -207,6 +221,40 @@ paths:
               schema:
                 $ref: "#/components/schemas/SeedResult"
 
+  /inventory/default-items:
+    get:
+      operationId: getDefaultItems
+      tags: [inventory]
+      summary: Get default items catalog
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of default items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Item"
+
   /invoices:
     get:
       operationId: listInvoices
@@ -221,6 +269,33 @@ paths:
           name: endDate
           schema:
             type: string
+        - in: query
+          name: paymentMethod
+          schema:
+            type: string
+            enum: [cash, upi]
+        - in: query
+          name: minAmount
+          schema:
+            type: number
+        - in: query
+          name: maxAmount
+          schema:
+            type: number
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
       responses:
         "200":
           description: List of invoices
@@ -296,9 +371,19 @@ paths:
       summary: List all customers
       parameters:
         - in: query
-          name: search
+          name: q
           schema:
             type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
       responses:
         "200":
           description: List of customers
@@ -388,6 +473,21 @@ paths:
       operationId: listLabour
       tags: [labour]
       summary: List all labour
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
       responses:
         "200":
           description: List of labour
@@ -484,6 +584,16 @@ paths:
           name: month
           schema:
             type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
       responses:
         "200":
           description: Attendance records
@@ -526,6 +636,16 @@ paths:
           name: month
           schema:
             type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
       responses:
         "200":
           description: Salary calculation
@@ -539,6 +659,17 @@ paths:
       operationId: listNotifications
       tags: [notifications]
       summary: List notifications
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
       responses:
         "200":
           description: Notifications
@@ -609,6 +740,16 @@ paths:
           schema:
             type: string
             enum: [daily, weekly, monthly]
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
       responses:
         "200":
           description: Sales data

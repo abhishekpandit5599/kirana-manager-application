@@ -15,6 +15,8 @@ router.patch("/items/:id", authMiddleware, validate(UpdateItemBody), inventoryCo
 router.delete("/items/:id", authMiddleware, inventoryController.deleteItem);
 
 // Default items catalog
+router.get("/inventory/categories", authMiddleware, inventoryController.getCategories);
+router.get("/inventory/default-categories", authMiddleware, inventoryController.getDefaultCategories);
 router.get("/inventory/default-items", authMiddleware, inventoryController.getDefaultItems);
 router.post("/inventory/add-defaults", authMiddleware, validate(AddDefaultItemsBody), inventoryController.addDefaultItems);
 

@@ -38,13 +38,19 @@ function generateInvoiceNumber(): string {
 
 export const invoiceService = {
   async listInvoices(shopId: string, filters: any, baseUrl: string) {
-    let invoices = await invoiceRepository.findAllByShop(shopId);
+    const limit = parseInt(filters.limit) || 20;
+    const offset = parseInt(filters.offset) || 0;
 
-    if (filters.startDate) invoices = invoices.filter((i) => i.createdAt >= new Date(filters.startDate));
-    if (filters.endDate) invoices = invoices.filter((i) => i.createdAt <= new Date(filters.endDate));
-    if (filters.customerId) invoices = invoices.filter((i) => i.customerId === filters.customerId);
-    if (filters.minAmount) invoices = invoices.filter((i) => parseFloat(i.total) >= filters.minAmount);
-    if (filters.maxAmount) invoices = invoices.filter((i) => parseFloat(i.total) <= filters.maxAmount);
+    // Default 1 month range if not provided
+    if (!filters.startDate && !filters.endDate) {
+      const end = new Date();
+      const start = new Date();
+      start.setMonth(start.getMonth() - 1);
+      filters.startDate = start.toISOString();
+      filters.endDate = end.toISOString();
+    }
+
+    const invoices = await invoiceRepository.findAllByShop(shopId, filters, { limit: Math.min(limit, 100), offset });
 
     return invoices.map((inv) => formatInvoice(inv, `${baseUrl}/api/invoices/${inv.id}/pdf`));
   },

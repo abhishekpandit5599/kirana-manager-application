@@ -3,6 +3,9 @@ import { aiService } from "./ai.service";
 import { getShop } from "../../middlewares/auth.middleware";
 import fs from "fs";
 
+import { sendSuccess } from "../../utils/response";
+import { SUCCESS_MESSAGES } from "../../utils/messages";
+
 export const aiController = {
   async processOcr(req: Request, res: Response, next: NextFunction) {
     try {
@@ -16,7 +19,7 @@ export const aiController = {
       }
 
       const result = await aiService.processOcr(shop.id, req.body.imageBase64, imageBuffer);
-      res.json(result);
+      sendSuccess(res, result, SUCCESS_MESSAGES.OCR_COMPLETED);
     } catch (err) { next(err); }
   },
 
@@ -24,7 +27,7 @@ export const aiController = {
     try {
       const shop = getShop(req);
       const result = await aiService.processVoice(shop.id, req.body.text);
-      res.json(result);
+      sendSuccess(res, result, SUCCESS_MESSAGES.VOICE_PROCESSED);
     } catch (err) { next(err); }
   },
 };

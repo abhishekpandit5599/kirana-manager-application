@@ -6,9 +6,7 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export type ListAttendanceParams = {
-  labourId?: string;
-  month?: string;
+export type ListNotificationsParams = {
   limit?: number;
   offset?: number;
 };

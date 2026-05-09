@@ -456,14 +456,14 @@ export default function LandingPage() {
                   
                   <div className="grid grid-cols-1 gap-y-4 mb-8">
                     {[
-                      "Invoice PDF via WhatsApp",
-                      "AI Voice Billing",
+                      "Invoice PDF Send Direct to Customer",
+                      "AI Voice Assistant",
                       "AI Product Scan (OCR)",
-                      "One-Click PDF Download",
-                      "Bulk Inventory Upload (Excel)",
-                      "50,000+ Pre-built Products",
+                      "Fast PDF Download",
+                      "Bulk Inventory Upload",
+                      "Default Inventory Import",
                       "Automated Daily Reports",
-                      "Labour & Salary Management",
+                      "Labour Attendance & Salary",
                       "100% Free Forever"
                     ].map((feature, fidx) => (
                       <div key={fidx} className="flex items-center gap-3 text-base font-bold">

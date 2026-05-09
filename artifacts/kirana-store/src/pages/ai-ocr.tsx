@@ -18,6 +18,7 @@ import {
 import { useLocation } from "wouter";
 import { useDispatch } from "react-redux";
 import { setAiExtractedItems } from "@/store/slices/billingSlice";
+import { processOcr } from "@/lib/api";
 
 interface ExtractedItem {
   name: string;
@@ -28,12 +29,6 @@ interface ExtractedItem {
   confidence: number;
 }
 
-function getAuthHeaders(): Record<string, string> {
-  const token = localStorage.getItem("kirana_token");
-  const headers: Record<string, string> = {};
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  return headers;
-}
 
 export default function AiOcr() {
   const { t } = useLanguage();
@@ -63,19 +58,9 @@ export default function AiOcr() {
     setExtractedItems(null);
     
     try {
-      const formData = new FormData();
-      formData.append("image", file);
+      const data = await processOcr(file);
       
-      const res = await fetch("/api/ai/ocr", {
-        method: "POST",
-        headers: getAuthHeaders(),
-        body: formData,
-      });
-      
-      if (!res.ok) throw new Error("Failed to process image");
-      const data = await res.json();
-      
-      if (data.success && data.items.length > 0) {
+      if (data && data.items && data.items.length > 0) {
         setExtractedItems(data.items);
         setRawText(data.rawText || "");
         toast({ title: t("List processed successfully!", "सूची सफलतापूर्वक स्कैन की गई!") });
@@ -107,7 +92,7 @@ export default function AiOcr() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">

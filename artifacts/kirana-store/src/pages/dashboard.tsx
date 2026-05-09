@@ -17,6 +17,7 @@ import {
   Plus,
   Loader2
 } from "lucide-react";
+import { ErrorState } from "@/components/error-state";
 import { 
   LineChart, 
   Line, 
@@ -33,7 +34,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export default function Dashboard() {
   const { t } = useLanguage();
-  const { data: dashboard, isLoading: dashboardLoading } = useGetDashboard();
+  const { data: dashboard, isLoading: dashboardLoading, isError, error, refetch } = useGetDashboard();
   
   const [analyticsPeriod, setAnalyticsPeriod] = useState<"daily" | "weekly" | "monthly">("daily");
   const { data: analytics, isLoading: analyticsLoading } = useGetSalesAnalytics({ period: analyticsPeriod });
@@ -48,6 +49,17 @@ export default function Dashboard() {
     );
   }
 
+  if (isError) {
+    return (
+      <div className="py-12">
+        <ErrorState 
+          message={error?.message} 
+          onRetry={() => refetch()} 
+        />
+      </div>
+    );
+  }
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -58,32 +70,35 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">{t("Dashboard", "डैशबोर्ड")}</h1>
-          <p className="text-muted-foreground">{t("Welcome back to your store", "आपकी दुकान में वापसी पर स्वागत है")}</p>
-        </div>
-        
-        {/* Quick Actions */}
-        <div className="flex flex-wrap gap-2">
-          <Link href="/billing">
-            <Button className="h-12 text-base shadow-md">
-              <Plus className="mr-2 h-5 w-5" />
-              {t("New Invoice", "नया बिल")}
-            </Button>
-          </Link>
-          <Link href="/ai-ocr">
-            <Button variant="secondary" className="h-12 text-base shadow-md">
-              <ScanLine className="mr-2 h-5 w-5" />
-              {t("Scan List", "स्कैन")}
-            </Button>
-          </Link>
-          <Link href="/ai-voice">
-            <Button variant="outline" className="h-12 text-base bg-white shadow-sm">
-              <Mic className="mr-2 h-5 w-5 text-primary" />
-              {t("Voice", "आवाज़")}
-            </Button>
-          </Link>
+      {/* Sticky Header Section */}
+      <div className="sticky top-14 md:top-0 z-20 -mx-4 md:-mx-6 px-4 md:px-6 pt-6 pb-4 space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">{t("Dashboard", "डैशबोर्ड")}</h1>
+            <p className="text-muted-foreground">{t("Welcome back to your store", "आपकी दुकान में वापसी पर स्वागत है")}</p>
+          </div>
+          
+          {/* Quick Actions */}
+          <div className="flex flex-wrap gap-2">
+            <Link href="/billing">
+              <Button className="h-12 text-base shadow-md border-none">
+                <Plus className="mr-2 h-5 w-5" />
+                {t("New Invoice", "नया बिल")}
+              </Button>
+            </Link>
+            <Link href="/ai-ocr">
+              <Button variant="secondary" className="h-12 text-base shadow-md border-none">
+                <ScanLine className="mr-2 h-5 w-5" />
+                {t("Scan List", "स्कैन")}
+              </Button>
+            </Link>
+            <Link href="/ai-voice">
+              <Button variant="outline" className="h-12 text-base bg-white shadow-sm border-[#cacbcf]">
+                <Mic className="mr-2 h-5 w-5 text-primary" />
+                {t("Voice", "आवाज़")}
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 

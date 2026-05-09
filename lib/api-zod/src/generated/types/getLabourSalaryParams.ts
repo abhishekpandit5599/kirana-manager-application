@@ -8,4 +8,6 @@
 
 export type GetLabourSalaryParams = {
   month?: string;
+  limit?: number;
+  offset?: number;
 };

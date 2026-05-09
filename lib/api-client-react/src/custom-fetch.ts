@@ -367,5 +367,16 @@ export async function customFetch<T = unknown>(
     throw new ApiError(response, errorData, requestInfo);
   }
 
-  return (await parseSuccessBody(response, responseType, requestInfo)) as T;
+  const result = await parseSuccessBody(response, responseType, requestInfo);
+  
+  // Standard format unwrapping
+  if (result && typeof result === 'object' && 'status' in result && 'data' in result) {
+    const standard = result as { status: boolean; data: any; message?: string; error?: string };
+    if (standard.status === false) {
+      throw new ApiError(response, standard, requestInfo);
+    }
+    return standard.data as T;
+  }
+
+  return result as T;
 }

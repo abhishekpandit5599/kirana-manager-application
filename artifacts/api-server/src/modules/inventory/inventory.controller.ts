@@ -1,14 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import { inventoryService } from "./inventory.service";
 import { getShop } from "../../middlewares/auth.middleware";
+import { sendSuccess, sendError } from "../../utils/response";
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from "../../utils/messages";
 
 export const inventoryController = {
   async listItems(req: Request, res: Response, next: NextFunction) {
     try {
       const shop = getShop(req);
-      const { category, lowStock } = req.query as { category?: string; lowStock?: string };
-      const items = await inventoryService.listItems(shop.id, category, lowStock);
-      res.json(items);
+      const items = await inventoryService.listItems(shop.id, req.query);
+      sendSuccess(res, items, SUCCESS_MESSAGES.FETCHED("Items"));
     } catch (err) { next(err); }
   },
 
@@ -16,7 +17,7 @@ export const inventoryController = {
     try {
       const shop = getShop(req);
       const item = await inventoryService.getItem((req.params.id as string), shop.id);
-      res.json(item);
+      sendSuccess(res, item, SUCCESS_MESSAGES.FETCHED("Item"));
     } catch (err) { next(err); }
   },
 
@@ -24,7 +25,7 @@ export const inventoryController = {
     try {
       const shop = getShop(req);
       const item = await inventoryService.createItem(shop.id, req.body);
-      res.status(201).json(item);
+      sendSuccess(res, item, SUCCESS_MESSAGES.CREATED("Item"), 201);
     } catch (err) { next(err); }
   },
 
@@ -32,7 +33,7 @@ export const inventoryController = {
     try {
       const shop = getShop(req);
       const item = await inventoryService.updateItem((req.params.id as string), shop.id, req.body);
-      res.json(item);
+      sendSuccess(res, item, SUCCESS_MESSAGES.UPDATED("Item"));
     } catch (err) { next(err); }
   },
 
@@ -40,14 +41,14 @@ export const inventoryController = {
     try {
       const shop = getShop(req);
       await inventoryService.deleteItem((req.params.id as string), shop.id);
-      res.sendStatus(204);
+      sendSuccess(res, null, SUCCESS_MESSAGES.DELETED("Item"), 200);
     } catch (err) { next(err); }
   },
 
   async getDefaultItems(req: Request, res: Response, next: NextFunction) {
     try {
-      const items = await inventoryService.getDefaultItems();
-      res.json(items);
+      const items = await inventoryService.getDefaultItems(req.query);
+      sendSuccess(res, items, SUCCESS_MESSAGES.FETCHED("Default items"));
     } catch (err) { next(err); }
   },
 
@@ -55,7 +56,22 @@ export const inventoryController = {
     try {
       const shop = getShop(req);
       const result = await inventoryService.addDefaultItems(shop.id, req.body.items);
-      res.status(201).json(result);
+      sendSuccess(res, result, SUCCESS_MESSAGES.CREATED("Default items"), 201);
+    } catch (err) { next(err); }
+  },
+
+  async getCategories(req: Request, res: Response, next: NextFunction) {
+    try {
+      const shop = getShop(req);
+      const categories = await inventoryService.getCategories(shop.id);
+      sendSuccess(res, categories, SUCCESS_MESSAGES.FETCHED("Categories"));
+    } catch (err) { next(err); }
+  },
+
+  async getDefaultCategories(req: Request, res: Response, next: NextFunction) {
+    try {
+      const categories = await inventoryService.getDefaultCategories();
+      sendSuccess(res, categories, SUCCESS_MESSAGES.FETCHED("Default categories"));
     } catch (err) { next(err); }
   },
 
@@ -73,9 +89,9 @@ export const inventoryController = {
     try {
       const shop = getShop(req);
       const mode = (req.body.mode || "update") as "create" | "update";
-      if (!req.file) { res.status(400).json({ error: "No file uploaded" }); return; }
+      if (!req.file) { sendError(res, ERROR_MESSAGES.NO_FILE_UPLOADED, 400); return; }
       const result = await inventoryService.importExcel(shop.id, req.file.buffer, mode);
-      res.json(result);
+      sendSuccess(res, result, SUCCESS_MESSAGES.UPDATED("Inventory"));
     } catch (err) { next(err); }
   },
 

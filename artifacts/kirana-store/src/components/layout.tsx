@@ -189,7 +189,7 @@ export function Layout({ children }: LayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 md:ml-60 p-4 md:p-6 bg-muted/30">
+      <main className="flex-1 md:ml-60 px-4 md:px-6 pb-4 md:pb-6 bg-muted/30 min-h-screen">
         <div className="max-w-6xl mx-auto pb-24 md:pb-0">
           {children}
         </div>

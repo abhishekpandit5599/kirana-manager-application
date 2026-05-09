@@ -15,9 +15,18 @@ function getAuthHeaders(): Record<string, string> {
   return headers;
 }
 
-async function handleResponse(res: Response) {
+export async function handleResponse(res: Response) {
   const data = await res.json().catch(() => null);
-  if (!res.ok) throw new Error(data?.error || data?.message || `Request failed (${res.status})`);
+  if (!res.ok) {
+    throw new Error(data?.error || data?.message || `Request failed (${res.status})`);
+  }
+  // Standard format unwrapping
+  if (data && typeof data === 'object' && 'status' in data && 'data' in data) {
+    if (data.status === false) {
+      throw new Error(data.error || data.message || "Request failed");
+    }
+    return data.data;
+  }
   return data;
 }
 
@@ -45,6 +54,18 @@ export async function getDefaultItems() {
 
 export async function addDefaultItems(items: any[]) {
   return handleResponse(await fetch(`${API_BASE}/inventory/add-defaults`, { method: "POST", headers: getHeaders(), body: JSON.stringify({ items }) }));
+}
+
+export async function getCategories() {
+  return handleResponse(await fetch(`${API_BASE}/inventory/categories`, { headers: getHeaders() }));
+}
+
+export async function getDefaultCategories() {
+  return handleResponse(await fetch(`${API_BASE}/inventory/default-categories`, { headers: getHeaders() }));
+}
+
+export async function markAllNotificationsRead() {
+  return handleResponse(await fetch(`${API_BASE}/notifications/read-all`, { method: "POST", headers: getHeaders() }));
 }
 
 export async function downloadExcelTemplate() {
@@ -106,4 +127,18 @@ export async function getDailyReport(date?: string) {
 // Customer stats
 export async function getCustomerStats(customerId: string) {
   return handleResponse(await fetch(`${API_BASE}/customers/${customerId}/stats`, { headers: getHeaders() }));
+}
+
+// AI endpoints
+export async function processOcr(file?: File, imageBase64?: string) {
+  if (file) {
+    const formData = new FormData();
+    formData.append("image", file);
+    return handleResponse(await fetch(`${API_BASE}/ai/ocr`, { method: "POST", headers: getAuthHeaders(), body: formData }));
+  }
+  return handleResponse(await fetch(`${API_BASE}/ai/ocr`, { method: "POST", headers: getHeaders(), body: JSON.stringify({ imageBase64 }) }));
+}
+
+export async function processVoice(text: string) {
+  return handleResponse(await fetch(`${API_BASE}/ai/voice`, { method: "POST", headers: getHeaders(), body: JSON.stringify({ text }) }));
 }

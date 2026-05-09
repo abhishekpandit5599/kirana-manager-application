@@ -210,14 +210,30 @@
 @layer base {
   * {
     @apply border-border;
+    outline: none !important;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  
+  :focus, :focus-visible, :focus-within, [data-state=open], [data-state=active] {
+    outline: none !important;
+    box-shadow: none !important;
+    --tw-ring-offset-width: 0px !important;
+    --tw-ring-width: 0px !important;
+    --tw-ring-color: transparent !important;
+    ring: none !important;
   }
 
   html {
     font-size: 14px;
+    overflow-x: hidden;
   }
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    overflow-x: hidden;
+    width: 100%;
   }
 
   button, 
@@ -239,35 +255,53 @@
     border-color: #cacbcf !important;
   }
 
-  /* Remove green focus borders from inputs globally */
+  /* Remove blue focus borders and rings from all interactive elements */
+  *:focus,
+  *:focus-visible,
+  [data-state="open"] {
+    outline: none !important;
+    /* box-shadow: 0 0 0 2px rgba(202, 203, 207, 0.3) !important; */
+  }
+
+  /* Custom subtle focus state for inputs */
   input:focus,
   select:focus,
   textarea:focus,
-  [role="combobox"]:focus,
-  .input:focus {
+  [role="combobox"]:focus {
     border-color: #cacbcf !important;
-    box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.1) !important; /* Very subtle green ring */
-    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(202, 203, 207, 0.2) !important;
   }
 
   /* Remove borders from primary buttons */
   .bg-primary,
   .bg-secondary,
-  .bg-destructive {
+  .bg-destructive,
+  button[class*="bg-primary"],
+  button[class*="bg-secondary"] {
     border: none !important;
   }
 
-  /* Global Card Hover */
+  /* Global Card & Button Hover */
   .card:hover,
-  [class*="Card"]:hover {
-    border-color: #cacbcf !important;
-    transition: border-color 0.2s ease;
-  }
-
-  /* Global Button Hover */
+  [class*="Card"]:hover,
   button:hover:not(:disabled),
-  .button:hover:not(:disabled) {
+  .button:hover:not(:disabled),
+  [role="button"]:hover {
     border-color: #cacbcf !important;
     transition: all 0.2s ease;
+  }
+
+  /* Increased spacing in Dialogs */
+  [role="dialog"] {
+    padding: 1.5rem !important;
+  }
+  
+  [role="dialog"] .space-y-4 > * + * {
+    margin-top: 1.5rem !important;
+  }
+
+  /* Modal Icon Pointer */
+  [role="dialog"] button {
+    cursor: pointer !important;
   }
 }

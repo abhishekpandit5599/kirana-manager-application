@@ -152,7 +152,7 @@ export default function DefaultItems() {
           <Button
             variant={activeCategory === "All" ? "default" : "secondary"}
             size="sm"
-            className={`rounded-full px-4 text-xs font-bold uppercase tracking-wider ${activeCategory === "All" ? "bg-primary" : "bg-white border-[#cacbcf]/50 hover:border-primary/50 text-muted-foreground"}`}
+            className={`rounded-full px-4 text-xs font-bold uppercase tracking-wider ${activeCategory === "All" ? "bg-primary" : "bg-white border-[#cacbcf]/50 hover:border-[#cacbcf] text-muted-foreground"}`}
             onClick={() => setActiveCategory("All")}
           >
             {t("All", "सभी")}
@@ -162,7 +162,7 @@ export default function DefaultItems() {
               key={cat}
               variant={activeCategory === cat ? "default" : "secondary"}
               size="sm"
-              className={`rounded-full px-4 text-xs font-bold uppercase tracking-wider ${activeCategory === cat ? "bg-primary" : "bg-white border-[#cacbcf]/50 hover:border-primary/50 text-muted-foreground"}`}
+              className={`rounded-full px-4 text-xs font-bold uppercase tracking-wider ${activeCategory === cat ? "bg-primary" : "bg-white border-[#cacbcf]/50 hover:border-[#cacbcf] text-muted-foreground"}`}
               onClick={() => setActiveCategory(cat)}
             >
               {cat}
@@ -190,7 +190,7 @@ export default function DefaultItems() {
                 return (
                   <Card 
                     key={item.id} 
-                    className={`cursor-pointer transition-all border-[#cacbcf]/30 hover:border-primary/50 group ${isSel ? "ring-2 ring-primary ring-offset-2 bg-primary/5" : "bg-card"}`} 
+                    className={`cursor-pointer transition-all border-[#cacbcf]/30 hover:border-[#cacbcf] group ${isSel ? "ring-2 ring-primary ring-offset-2 bg-primary/5" : "bg-card"}`} 
                     onClick={() => toggleItem(item as any)}
                   >
                     <CardContent className="p-4">
@@ -200,7 +200,7 @@ export default function DefaultItems() {
                             {isSel && <div className="w-2 h-2 bg-white rounded-full" />}
                           </div>
                           <div>
-                            <p className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">{item.name}</p>
+                            <p className="font-bold text-lg text-foreground transition-colors">{item.name}</p>
                             <Badge variant="secondary" className="mt-1 text-[10px] uppercase">{item.category}</Badge>
                           </div>
                         </div>

@@ -374,10 +374,10 @@ export default function Invoices() {
 
       {/* Invoice Details Dialog */}
       <Dialog open={!!selectedInvoice} onOpenChange={(open) => !open && setSelectedInvoice(null)}>
-        <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden border-none shadow-2xl">
+        <DialogContent className="sm:max-w-[600px] w-[95vw] h-[90vh] sm:h-auto sm:max-h-[90vh] p-0 overflow-hidden border-none shadow-2xl flex flex-col">
           {selectedInvoice ? (
-            <div className="flex flex-col h-full bg-white animate-in fade-in slide-in-from-bottom-4 duration-300">
-              <div className="p-8 border-b bg-muted/10 relative">
+            <div className="flex flex-col h-full bg-white animate-in fade-in slide-in-from-bottom-4 duration-300 overflow-hidden">
+              <div className="p-6 sm:p-8 border-b bg-muted/10 flex-none relative">
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
                     <h2 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-2">
@@ -395,7 +395,7 @@ export default function Invoices() {
                 </div>
               </div>
 
-              <div className="p-8 space-y-10 overflow-y-auto max-h-[70vh] custom-scrollbar">
+              <div className="p-6 sm:p-8 space-y-8 overflow-y-auto flex-1 custom-scrollbar">
                 {/* Billing Details Grid */}
                 <div className="grid grid-cols-2 gap-8">
                   <div className="space-y-2">
@@ -456,7 +456,7 @@ export default function Invoices() {
               </div>
 
               {/* Action Buttons */}
-              <div className="p-8 bg-muted/5 border-t flex gap-4">
+              <div className="p-6 sm:p-8 bg-muted/5 border-t flex flex-col sm:flex-row gap-3 sm:gap-4 flex-none">
                 <Button variant="outline" className="flex-1 h-14 rounded-2xl border-[#cacbcf] font-bold text-lg hover:bg-white hover:scale-[1.02] transition-all" onClick={() => downloadPdf(selectedInvoice)} disabled={isPdfLoading}>
                   {isPdfLoading ? <Loader2 className="mr-3 h-5 w-5 animate-spin" /> : <Download className="mr-3 h-5 w-5" />}
                   {t("Download PDF", "PDF डाउनलोड")}

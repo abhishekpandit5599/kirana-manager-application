@@ -19,7 +19,7 @@ export default function Settings() {
   const [settings, setSettings] = useState<any>({});
   const [shopName, setShopName] = useState("");
   const [upiId, setUpiId] = useState("");
-  const [themeColor, setThemeColor] = useState("#1e40af");
+  const [themeColor, setThemeColor] = useState("#10b981");
   const [ownerWhatsapp, setOwnerWhatsapp] = useState("");
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function Settings() {
       setSettings(data);
       setUpiId(data.upiId || "");
       setShopName(data.shopName || "");
-      setThemeColor(data.themeColor || "#1e40af");
+      setThemeColor(data.themeColor || "#10b981");
       setOwnerWhatsapp(data.ownerWhatsapp || "");
       setLoading(false);
     }).catch(() => setLoading(false));
@@ -84,16 +84,16 @@ export default function Settings() {
 
   return (
     <div className="space-y-6 max-w-2xl pt-6">
-      <div><h1 className="text-xl font-bold flex items-center gap-2"><SettingsIcon className="h-5 w-5" />{t("Settings","सेटिंग्स")}</h1><p className="text-sm text-muted-foreground">{t("Configure your shop preferences","दुकान की प्राथमिकताएं कॉन्फ़िगर करें")}</p></div>
+      <div><h1 className="text-xl font-bold flex items-center gap-2"><SettingsIcon className="h-5 w-5" />{t("Settings", "सेटिंग्स")}</h1><p className="text-sm text-muted-foreground">{t("Configure your shop preferences", "दुकान की प्राथमिकताएं कॉन्फ़िगर करें")}</p></div>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">{t("Shop Details","दुकान विवरण")}</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">{t("Shop Details", "दुकान विवरण")}</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div><Label>{t("Shop Name","दुकान का नाम")}</Label><Input placeholder="My Kirana Store" value={shopName} onChange={e => setShopName(e.target.value)} /></div>
-          <div><Label>{t("Shop Logo","दुकान का लोगो")}</Label>
+          <div><Label>{t("Shop Name", "दुकान का नाम")}</Label><Input placeholder="My Kirana Store" value={shopName} onChange={e => setShopName(e.target.value)} /></div>
+          <div><Label>{t("Shop Logo", "दुकान का लोगो")}</Label>
             <div className="flex items-center gap-3 mt-1">
               {settings.logoUrl && <img src={settings.logoUrl} alt="Logo" className="w-12 h-12 rounded-lg object-cover border" />}
-              <label className="cursor-pointer"><input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} /><Button variant="outline" size="sm" asChild><span><Upload className="mr-1 h-3 w-3" />{t("Upload","अपलोड")}</span></Button></label>
+              <label className="cursor-pointer"><input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} /><Button variant="outline" size="sm" asChild><span><Upload className="mr-1 h-3 w-3" />{t("Upload", "अपलोड")}</span></Button></label>
               {settings.logoUrl && (
                 <Button variant="ghost" size="sm" onClick={async () => {
                   try {
@@ -115,22 +115,22 @@ export default function Settings() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">{t("Payment","भुगतान")}</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">{t("Payment", "भुगतान")}</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div><Label>UPI ID</Label><Input placeholder="yourshop@upi" value={upiId} onChange={e => setUpiId(e.target.value)} /><p className="text-xs text-muted-foreground mt-1">{t("Used to generate QR codes for UPI payments","UPI भुगतान के लिए QR कोड बनाने में उपयोग होता है")}</p></div>
+          <div><Label>UPI ID</Label><Input placeholder="yourshop@upi" value={upiId} onChange={e => setUpiId(e.target.value)} /><p className="text-xs text-muted-foreground mt-1">{t("Used to generate QR codes for UPI payments", "UPI भुगतान के लिए QR कोड बनाने में उपयोग होता है")}</p></div>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">{t("Notifications","सूचनाएं")}</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">{t("Notifications", "सूचनाएं")}</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div><Label>{t("WhatsApp Number","WhatsApp नंबर")}</Label><Input placeholder="+91 9876543210" value={ownerWhatsapp} onChange={e => setOwnerWhatsapp(e.target.value)} /><p className="text-xs text-muted-foreground mt-1">{t("Daily report will be sent here at 10 PM","दैनिक रिपोर्ट रात 10 बजे यहां भेजी जाएगी")}</p></div>
+          <div><Label>{t("WhatsApp Number", "WhatsApp नंबर")}</Label><Input placeholder="+91 9876543210" value={ownerWhatsapp} onChange={e => setOwnerWhatsapp(e.target.value)} /><p className="text-xs text-muted-foreground mt-1">{t("Daily report will be sent here at 10 PM", "दैनिक रिपोर्ट रात 10 बजे यहां भेजी जाएगी")}</p></div>
         </CardContent>
       </Card>
 
       <Button className="w-full h-12 font-bold" onClick={handleSave} disabled={saving}>
         {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-        {t("Save Settings","सेटिंग्स सहेजें")}
+        {t("Save Settings", "सेटिंग्स सहेजें")}
       </Button>
     </div>
   );

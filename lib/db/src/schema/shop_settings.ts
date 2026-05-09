@@ -6,7 +6,7 @@ export const shopSettingsTable = pgTable("shop_settings", {
   id: uuid("id").primaryKey().defaultRandom(),
   shopId: uuid("shop_id").notNull().unique(),
   logoUrl: text("logo_url"),
-  themeColor: text("theme_color").default("#1e40af"),
+  themeColor: text("theme_color").default("#10b981"),
   upiId: text("upi_id"),
   upiQrUrl: text("upi_qr_url"),
   language: text("language").default("en"),

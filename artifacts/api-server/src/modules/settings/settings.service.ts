@@ -11,7 +11,7 @@ export const settingsService = {
     return {
       ...(settings ?? {
         logoUrl: null,
-        themeColor: "#1e40af",
+        themeColor: "#10b981",
         upiId: null,
         upiQrUrl: null,
         language: "en",

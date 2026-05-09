@@ -149,19 +149,15 @@ export default function Invoices() {
         </Button>
       </div>
 
-      <Card className="shadow-sm">
-        <CardContent className="p-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 h-6 w-6 text-muted-foreground" />
-            <Input 
-              placeholder={t("Search by invoice number or customer name...", "बिल नंबर या ग्राहक के नाम से खोजें...")} 
-              className="pl-11 h-12 text-lg"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </CardContent>
-      </Card>
+      <div className="relative group">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+        <Input 
+          placeholder={t("Search by invoice number or customer name...", "बिल नंबर या ग्राहक के नाम से खोजें...")} 
+          className="pl-12 h-12 text-lg bg-white border-[#cacbcf] rounded-xl transition-all" 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
 
       {isLoading ? (
         <div className="h-[40vh] flex items-center justify-center">
@@ -172,7 +168,7 @@ export default function Invoices() {
           {filteredInvoices.map((invoice) => (
             <Card 
               key={invoice.id} 
-              className="shadow-sm cursor-pointer hover:border-primary transition-colors"
+              className="shadow-sm cursor-pointer hover:border-[#cacbcf] transition-colors"
               onClick={() => setSelectedInvoice(invoice)}
             >
               <CardContent className="p-0">

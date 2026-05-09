@@ -275,36 +275,34 @@ export default function Inventory() {
       </div>
 
       {/* Filters & Search */}
-      <Card className="shadow-sm">
-        <CardContent className="p-4 flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-3 h-6 w-6 text-muted-foreground" />
-            <Input 
-              placeholder={t("Search items...", "सामान खोजें...")} 
-              className="pl-11 h-12 text-lg"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-full md:w-[200px] h-12 text-base">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t("All Categories", "सभी वर्ग")}</SelectItem>
-              {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Button 
-            variant={lowStockFilter ? "destructive" : "outline"} 
-            className="h-12 text-base"
-            onClick={() => setLowStockFilter(!lowStockFilter)}
-          >
-            <AlertTriangle className="mr-2 h-5 w-5" />
-            {t("Low Stock Only", "केवल कम स्टॉक")}
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col md:flex-row gap-4 items-center">
+        <div className="relative flex-1 group w-full">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          <Input 
+            placeholder={t("Search items...", "सामान खोजें...")} 
+            className="pl-12 h-12 text-lg bg-white border-[#cacbcf] rounded-xl transition-all" 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="w-full md:w-[200px] h-12 text-base border-[#cacbcf] rounded-xl bg-white">
+            <SelectValue placeholder="Category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t("All Categories", "सभी वर्ग")}</SelectItem>
+            {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Button 
+          variant={lowStockFilter ? "destructive" : "outline"} 
+          className="h-12 text-base px-6 rounded-xl border-[#cacbcf] hover:border-[#cacbcf]"
+          onClick={() => setLowStockFilter(!lowStockFilter)}
+        >
+          <AlertTriangle className="mr-2 h-5 w-5" />
+          {t("Low Stock Only", "केवल कम स्टॉक")}
+        </Button>
+      </div>
 
       {/* Item List */}
       {isLoading ? (

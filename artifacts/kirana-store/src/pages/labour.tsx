@@ -369,7 +369,7 @@ export default function Labour() {
                 <button
                   key={labour.id}
                   onClick={() => setSelectedLabourForSalary(labour.id)}
-                  className={`w-full text-left rounded-lg border p-3 flex items-center gap-3 transition-all text-sm ${selectedLabourForSalary === labour.id ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40'}`}
+                  className={`w-full text-left rounded-lg border p-3 flex items-center gap-3 transition-all text-sm ${selectedLabourForSalary === labour.id ? 'border-primary bg-primary/5' : 'border-border hover:border-[#cacbcf]'}`}
                 >
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs flex-shrink-0">
                     {labour.name.charAt(0).toUpperCase()}

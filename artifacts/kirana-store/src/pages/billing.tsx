@@ -271,11 +271,11 @@ export default function Billing() {
           <h1 className="text-xl font-bold">{t("New Invoice", "नया बिल")}</h1>
         </div>
 
-        <div className="relative">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+        <div className="relative group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <Input
             placeholder={t("Search items...", "सामान खोजें...")}
-            className="pl-9 h-9 text-sm"
+            className="pl-12 h-10 text-base bg-white border-[#cacbcf] rounded-xl transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -293,7 +293,7 @@ export default function Billing() {
                 return (
                   <button
                     key={item.id}
-                    className={`rounded-lg border p-3 text-left transition-all hover:shadow-sm active:scale-95 ${inCart ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/40'}`}
+                    className={`rounded-lg border p-3 text-left transition-all hover:shadow-sm active:scale-95 ${inCart ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-[#cacbcf]'}`}
                     onClick={() => addToCart(item)}
                   >
                     <div className="font-semibold text-sm truncate">{item.name}</div>
@@ -432,14 +432,14 @@ export default function Billing() {
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setPaymentMethod("cash")}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-semibold transition-all ${paymentMethod === "cash" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/40"}`}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-semibold transition-all ${paymentMethod === "cash" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-[#cacbcf]"}`}
               >
                 <IndianRupee className="h-4 w-4" />
                 {t("Cash", "नकद")}
               </button>
               <button
                 onClick={() => setPaymentMethod("upi")}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-semibold transition-all ${paymentMethod === "upi" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/40"}`}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-semibold transition-all ${paymentMethod === "upi" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-[#cacbcf]"}`}
               >
                 <QrCode className="h-4 w-4" />
                 UPI

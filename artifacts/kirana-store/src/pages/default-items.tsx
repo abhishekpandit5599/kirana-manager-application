@@ -72,7 +72,7 @@ export default function DefaultItems() {
         <Badge className="bg-primary">{selected.size} {t("selected","चुने")}</Badge>
       </div>
       <div className="flex gap-2">
-        <div className="relative flex-1"><Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" /><Input placeholder={t("Search...","खोजें...")} className="pl-9 h-9" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} /></div>
+        <div className="relative flex-1"><Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" /><Input placeholder={t("Search...","खोजें...")} className="pl-9 h-9 border-[#cacbcf] focus:border-primary" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} /></div>
         <Button variant="outline" size="sm" onClick={() => { const n = new Map(selected); filtered.forEach(i => { if(!n.has(i.id)) n.set(i.id, {...i,stock:10,editedPrice:i.price}); }); setSelected(n); }}>Select All</Button>
         <Button variant="ghost" size="sm" onClick={() => setSelected(new Map())}>Clear</Button>
       </div>
@@ -85,7 +85,7 @@ export default function DefaultItems() {
         {filtered.map(item => {
           const isSel = selected.has(item.id); const sel = selected.get(item.id);
           return (
-            <div key={item.id} className={`rounded-lg border p-3 cursor-pointer transition-all ${isSel ? "border-primary bg-primary/5" : "border-border bg-card hover:border-primary/30"}`} onClick={() => toggleItem(item)}>
+            <div key={item.id} className={`rounded-lg border p-3 cursor-pointer transition-all ${isSel ? "border-primary bg-primary/5" : "border-border bg-card hover:border-[#cacbcf]"}`} onClick={() => toggleItem(item)}>
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2"><Checkbox checked={isSel} /><div><p className="font-semibold text-sm">{item.name}</p><p className="text-xs text-muted-foreground">{item.category}</p></div></div>
                 <span className="text-primary font-bold text-sm">₹{item.price}/{item.unit}</span>

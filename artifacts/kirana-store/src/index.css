@@ -219,4 +219,55 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+
+  button, 
+  [role="button"],
+  .cursor-pointer,
+  .card,
+  input[type="submit"],
+  select {
+    cursor: pointer !important;
+  }
+
+  /* Global Input/Select/Button Borders */
+  input, 
+  select, 
+  textarea,
+  [role="combobox"],
+  .input,
+  .select-trigger {
+    border-color: #cacbcf !important;
+  }
+
+  /* Remove green focus borders from inputs globally */
+  input:focus,
+  select:focus,
+  textarea:focus,
+  [role="combobox"]:focus,
+  .input:focus {
+    border-color: #cacbcf !important;
+    box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.1) !important; /* Very subtle green ring */
+    outline: none !important;
+  }
+
+  /* Remove borders from primary buttons */
+  .bg-primary,
+  .bg-secondary,
+  .bg-destructive {
+    border: none !important;
+  }
+
+  /* Global Card Hover */
+  .card:hover,
+  [class*="Card"]:hover {
+    border-color: #cacbcf !important;
+    transition: border-color 0.2s ease;
+  }
+
+  /* Global Button Hover */
+  button:hover:not(:disabled),
+  .button:hover:not(:disabled) {
+    border-color: #cacbcf !important;
+    transition: all 0.2s ease;
+  }
 }

@@ -28,16 +28,16 @@ body {
   margin-bottom: 8px;
 }
 
-.company-info { line-height: 1.4; }
+.company-info { line-height: 1.8; }
 
-.invoice-meta { text-align: right; }
+.invoice-meta { text-align: right; line-height: 1.8; }
 
 .invoice-title {
   font-size: 24px;
   font-weight: bold;
 }
 
-.recipient { margin-bottom: 20px; }
+.recipient { margin-bottom: 20px; line-height: 1.8; }
 
 table {
   width: 100%;
@@ -72,7 +72,7 @@ th {
 
     <div class="company-info">
       <strong>{{shopName}}</strong><br/>
-      {{shopAddress || ""}}<br/>
+      {{shopAddress}}<br/>
       {{shopPhone ? `Phone: ${shopPhone}` : ""}}
     </div>
   </div>
@@ -88,8 +88,8 @@ th {
 <!-- CUSTOMER -->
 <div class="recipient">
   <strong>Bill To:</strong><br/>
-  {{customerName || "Customer"}}<br/>
-  {{customerPhone || ""}}
+  {{customerName}}<br/>
+  {{customerPhone}}
 </div>
 
 <!-- ITEMS -->
@@ -98,7 +98,7 @@ th {
     <tr>
       <th style="width:5%">#</th>
       <th>Description</th>
-      <th style="width:10%; text-align:right;">Qty</th>
+      <th style="width:10%; text-align:left;">Qty</th>
       <th style="width:15%; text-align:right;">Price</th>
       <th style="width:15%; text-align:right;">Amount</th>
     </tr>
@@ -123,8 +123,8 @@ th {
 
 <!-- FOOTER -->
 <div style="clear:both; text-align:center; margin-top:50px;">
-  Thank you for your purchase!<br/>
-  <strong>{{shopName}}</strong>
+  <p style="margin-bottom: 2px;">Thank you for your purchase!</p>
+  <p style="margin-top: 5px;"><strong>{{shopName}}</strong></p>
 </div>
 
 </body>

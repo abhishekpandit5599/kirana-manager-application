@@ -155,7 +155,7 @@ export default function Dashboard() {
               value={analyticsPeriod} 
               onValueChange={(val: any) => setAnalyticsPeriod(val)}
             >
-              <SelectTrigger className="w-[120px]">
+              <SelectTrigger className="w-[120px] border-[#cacbcf]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

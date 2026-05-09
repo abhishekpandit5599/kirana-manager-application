@@ -36,11 +36,11 @@ export function generateInvoiceHtml(invoice: InvoiceForPdf): Record<string, stri
 
         return `
           <tr>
-            <td>${i + 1}</td>
+            <td style="width:5%">${i + 1}</td>
             <td>${item.itemName}</td>
-            <td>${displayQtyStr}</td>
-            <td>₹${item.price.toFixed(2)}</td>
-            <td>₹${item.total.toFixed(2)}</td>
+            <td style="width:10%; text-align:left;">${displayQtyStr}</td>
+            <td style="width:15%; text-align:right;">₹${item.price.toFixed(2)}</td>
+            <td style="width:15%; text-align:right;">₹${item.total.toFixed(2)}</td>
           </tr>
         `;
       }

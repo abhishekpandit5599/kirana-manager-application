@@ -130,11 +130,11 @@ export default function Customers() {
         </Button>
       </div>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+      <div className="relative group">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
         <Input
           placeholder={t("Search by name or phone...", "नाम या फोन से खोजें...")}
-          className="pl-9 h-9 text-sm"
+          className="pl-12 h-10 text-base bg-white border-[#cacbcf] rounded-xl transition-all"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -157,7 +157,7 @@ export default function Customers() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
           {filteredCustomers.map(customer => (
-            <Card key={customer.id} className="shadow-sm hover:shadow transition-shadow">
+            <Card key={customer.id} className="shadow-sm hover:shadow transition-shadow border-[#cacbcf]">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-3 min-w-0">

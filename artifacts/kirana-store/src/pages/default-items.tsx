@@ -118,7 +118,7 @@ export default function DefaultItems() {
   return (
     <div className="space-y-6">
       {/* Sticky Header Section */}
-      <div className="sticky top-0 z-20 -mx-4 md:-mx-6 px-4 md:px-6 pt-6 pb-4 space-y-6 bg-background/95 backdrop-blur-md">
+      <div className="md:sticky md:top-0 z-20 -mx-4 md:-mx-6 px-4 md:px-6 pt-6 pb-4 space-y-6 md:bg-background/95 md:backdrop-blur-md">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground">{t("Default Items Catalog","डिफ़ॉल्ट सामान")}</h1>
@@ -148,7 +148,7 @@ export default function DefaultItems() {
         </div>
         
         {/* Categories Pills - Wrapped for better UI */}
-        <div className="flex flex-wrap gap-2 pt-2">
+        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar sm:overflow-visible sm:pb-0">
           <Button
             variant={activeCategory === "All" ? "default" : "secondary"}
             size="sm"

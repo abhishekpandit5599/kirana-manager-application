@@ -292,16 +292,24 @@
   }
 
   /* Increased spacing in Dialogs */
-  [role="dialog"] {
+  .dialog-content {
     padding: 1.5rem !important;
   }
   
-  [role="dialog"] .space-y-4 > * + * {
+  .dialog-content .space-y-4 > * + * {
     margin-top: 1.5rem !important;
   }
 
   /* Modal Icon Pointer */
   [role="dialog"] button {
     cursor: pointer !important;
+  }
+  /* Scrollbar hide utility */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }

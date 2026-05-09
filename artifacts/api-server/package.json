@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "export NODE_ENV=development && pnpm run build && pnpm run start:dev",
     "build": "node ./build.mjs",
-    "start": "node --enable-source-maps ./dist/index.mjs",
-    "start:dev": "node --env-file=../../.env --enable-source-maps ./dist/index.mjs",
+    "start": "pnpm --filter @workspace/db push && node --enable-source-maps ./dist/index.mjs",
+    "start:dev": "pnpm --filter @workspace/db push && node --env-file=../../.env --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

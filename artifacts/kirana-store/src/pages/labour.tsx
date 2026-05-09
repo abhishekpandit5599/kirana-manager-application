@@ -210,7 +210,7 @@ export default function Labour() {
     <div className="space-y-6">
       <Tabs defaultValue="today" className="w-full">
         {/* Sticky Header Section */}
-        <div className="sticky top-0 z-20 -mx-4 md:-mx-6 px-4 md:px-6 pt-6 pb-4 space-y-6 bg-background/95 backdrop-blur-md">
+        <div className="md:sticky md:top-0 z-20 -mx-4 md:-mx-6 px-4 md:px-6 pt-6 pb-4 space-y-6 md:bg-background/95 md:backdrop-blur-md">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold text-foreground">{t("Labour Management", "मजदूर प्रबंधन")}</h1>
@@ -227,11 +227,13 @@ export default function Labour() {
             </div>
           </div>
 
-          <TabsList className="flex items-center justify-start gap-1 h-11 p-1 bg-muted/40 rounded-xl w-fit">
-            <TabsTrigger value="today" className="rounded-lg h-full text-xs font-bold transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm px-4">{t("Today's Attendance", "आज की हाजिरी")}</TabsTrigger>
-            <TabsTrigger value="history" className="rounded-lg h-full text-xs font-bold transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm px-4">{t("Attendance History", "हाजिरी इतिहास")}</TabsTrigger>
-            <TabsTrigger value="salary" className="rounded-lg h-full text-xs font-bold transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm px-4">{t("Salary", "वेतन")}</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+            <TabsList className="flex items-center justify-start gap-1 h-11 p-1 bg-muted/40 rounded-xl w-fit">
+              <TabsTrigger value="today" className="rounded-lg h-full text-xs font-bold transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm px-4 whitespace-nowrap">{t("Today's Attendance", "आज की हाजिरी")}</TabsTrigger>
+              <TabsTrigger value="history" className="rounded-lg h-full text-xs font-bold transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm px-4 whitespace-nowrap">{t("Attendance History", "हाजिरी इतिहास")}</TabsTrigger>
+              <TabsTrigger value="salary" className="rounded-lg h-full text-xs font-bold transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm px-4 whitespace-nowrap">{t("Salary", "वेतन")}</TabsTrigger>
+            </TabsList>
+          </div>
 
         </div>
 

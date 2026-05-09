@@ -71,7 +71,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Sticky Header Section */}
-      <div className="sticky top-14 md:top-0 z-20 -mx-4 md:-mx-6 px-4 md:px-6 pt-6 pb-4 space-y-4">
+      <div className="md:sticky md:top-0 z-20 -mx-4 md:-mx-6 px-4 md:px-6 pt-6 pb-4 space-y-4 md:bg-background/95 md:backdrop-blur-md">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground">{t("Dashboard", "डैशबोर्ड")}</h1>

@@ -31,6 +31,7 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const { data: user } = useGetMe();
@@ -41,6 +42,11 @@ export function Layout({ children }: LayoutProps) {
   useEffect(() => {
     dispatch(fetchSettings());
   }, [dispatch]);
+  
+  // Close mobile menu on navigation
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location]);
 
   useEffect(() => {
     if (settings.themeColor) {
@@ -118,22 +124,22 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="h-screen bg-background flex flex-col md:flex-row overflow-hidden">
       {/* Mobile Header */}
-      <header className="md:hidden sticky top-0 z-50 flex items-center justify-between p-3 bg-card border-b">
-        <Sheet>
+      <header className="md:hidden sticky top-0 z-50 flex items-center justify-between p-3 bg-card border-b shadow-sm">
+        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="h-9 w-9">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-[280px] p-0">
-            <div className="p-5 bg-primary text-primary-foreground flex items-center gap-3">
+          <SheetContent side="left" className="w-[280px] p-0 border-none !p-0">
+            <div className="p-4 bg-primary text-primary-foreground flex items-center gap-3">
               <ShopLogo size="lg" />
               <div className="min-w-0">
                 <h2 className="text-lg font-bold truncate">{settings.shopName || (user as any)?.shopName || "Kirana"}</h2>
                 <p className="text-sm opacity-90 truncate">{user?.name}</p>
               </div>
             </div>
-            <div className="p-3 flex flex-col h-[calc(100vh-88px)]">
+            <div className="p-2 flex flex-col h-[calc(100vh-80px)]">
               <NavLinks />
               <div className="mt-auto space-y-3">
                 <div className="flex items-center justify-between px-2">

@@ -152,6 +152,9 @@ importers:
       concurrently:
         specifier: ^9.2.1
         version: 9.2.1
+      dotenv:
+        specifier: ^17.4.2
+        version: 17.4.2
       prettier:
         specifier: ^3.8.1
         version: 3.8.1

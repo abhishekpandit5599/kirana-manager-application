@@ -291,7 +291,7 @@ export default function Billing() {
     <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-110px)] md:h-[calc(100vh-140px)] min-h-[600px] pt-0">
       {/* Left: Item picker */}
       <div className="w-full lg:w-3/5 flex flex-col gap-3 h-full">
-        <div className="sticky top-14 md:top-0 z-10 -mx-4 md:-mx-0 px-4 md:px-0 pt-6 pb-4 space-y-4">
+        <div className="sticky top-0 z-20 -mx-4 md:-mx-0 px-4 md:px-0 pt-6 pb-4 space-y-4 bg-background/95 backdrop-blur-md">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold">{t("New Invoice", "नया बिल")}</h1>
           </div>

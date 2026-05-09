@@ -116,7 +116,7 @@ export function Layout({ children }: LayoutProps) {
   );
 
   return (
-    <div className="min-h-screen bg-background flex flex-col md:flex-row">
+    <div className="h-screen bg-background flex flex-col md:flex-row overflow-hidden">
       {/* Mobile Header */}
       <header className="md:hidden sticky top-0 z-50 flex items-center justify-between p-3 bg-card border-b">
         <Sheet>
@@ -188,8 +188,7 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 md:ml-60 px-4 md:px-6 pb-4 md:pb-6 bg-muted/30 min-h-screen">
+      <main className="flex-1 md:ml-60 bg-muted/30 overflow-y-auto h-full px-4 md:px-6 pb-4 md:pb-6">
         <div className="max-w-6xl mx-auto pb-24 md:pb-0">
           {children}
         </div>

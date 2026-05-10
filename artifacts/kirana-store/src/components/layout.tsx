@@ -139,11 +139,11 @@ export function Layout({ children }: LayoutProps) {
                 <p className="text-sm opacity-90 truncate">{user?.name}</p>
               </div>
             </div>
-            <div className="flex flex-col h-[calc(100vh-80px)]">
-              <div className="flex-1 overflow-y-auto p-2">
+            <div className="flex flex-col h-[calc(100vh-70px)] md:h-[calc(100vh-80px)]">
+              <div className="h-[70%] md:flex-1 overflow-y-auto p-2">
                 <NavLinks />
               </div>
-              <div className="p-4 border-t bg-card space-y-3">
+              <div className="h-[30%] md:h-auto p-4 border-t bg-card space-y-3">
                 <div className="flex items-center justify-between px-2">
                   <span className="text-sm font-medium">Language / भाषा</span>
                   <div className="flex bg-muted rounded-lg p-0.5">

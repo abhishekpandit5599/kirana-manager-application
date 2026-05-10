@@ -1,6 +1,9 @@
 import nodemailer from "nodemailer";
 import { config } from "../config";
 import { logger } from "./logger";
+import { Resend } from "resend";
+
+const resend = new Resend(config.smtpPass);
 
 let transporter: nodemailer.Transporter | null = null;
 
@@ -25,8 +28,15 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
     return false;
   }
   try {
-    await getTransporter().sendMail({
-      from: `"KiranaPro" <${config.smtpFromUser}>`,
+    // await getTransporter().sendMail({
+    //   from: `"KiranaPro" <${config.smtpFromUser}>`,
+    //   to,
+    //   subject,
+    //   html,
+    // });
+
+    const response = await resend.emails.send({
+      from: `KiranaPro <${config.smtpFromUser}>`,
       to,
       subject,
       html,

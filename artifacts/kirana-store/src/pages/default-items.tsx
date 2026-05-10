@@ -15,7 +15,7 @@ import { useInView } from "react-intersection-observer";
 import { useDebounce } from "@/hooks/use-debounce";
 
 interface DefaultItem { id: string; name: string; category: string; price: number | string; unit: string; }
-interface SelectedItem extends DefaultItem { stock: number; editedPrice: number | string; }
+interface SelectedItem extends DefaultItem { stock: number; editedPrice: number | string; editedUnit: string; }
 
 export default function DefaultItems() {
   const { t } = useLanguage();
@@ -75,12 +75,12 @@ export default function DefaultItems() {
     setSelected((prev) => {
       const next = new Map(prev);
       if (next.has(item.id)) next.delete(item.id);
-      else next.set(item.id, { ...item, stock: 10, editedPrice: item.price });
+      else next.set(item.id, { ...item, stock: 10, editedPrice: item.price, editedUnit: item.unit });
       return next;
     });
   };
 
-  const updateSel = (id: string, f: "stock"|"editedPrice", v: number) => {
+  const updateSel = (id: string, f: "stock"|"editedPrice"|"editedUnit", v: any) => {
     setSelected((prev) => { const n = new Map(prev); const i = n.get(id); if(i) n.set(id, {...i,[f]:v}); return n; });
   };
 
@@ -88,7 +88,7 @@ export default function DefaultItems() {
     const n = new Map(selected);
     items.forEach(i => {
       if (!n.has(i.id)) {
-        n.set(i.id, { ...i, stock: 10, editedPrice: i.price });
+        n.set(i.id, { ...i, stock: 10, editedPrice: i.price, editedUnit: i.unit });
       }
     });
     setSelected(n);
@@ -103,7 +103,7 @@ export default function DefaultItems() {
         category: s.category, 
         price: s.editedPrice, 
         stock: s.stock, 
-        unit: s.unit 
+        unit: s.editedUnit 
       }));
       await addDefaultItems(arr);
       toast({ title: t("Items Added!", "सामान जोड़ दिया!") });
@@ -147,8 +147,8 @@ export default function DefaultItems() {
           </div>
         </div>
         
-        {/* Categories Pills - Wrapped for better UI */}
-        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar sm:overflow-visible sm:pb-0">
+        {/* Categories Pills - Wrapped for desktop, scrollable for mobile */}
+        <div className="flex flex-nowrap md:flex-wrap gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 no-scrollbar">
           <Button
             variant={activeCategory === "All" ? "default" : "secondary"}
             size="sm"
@@ -211,14 +211,35 @@ export default function DefaultItems() {
                       </div>
                       
                       {isSel && sel && (
-                        <div className="mt-4 flex gap-4 pt-4 border-t border-primary/20 animate-in fade-in slide-in-from-top-1" onClick={e => e.stopPropagation()}>
-                          <div className="flex-1 space-y-1">
+                        <div className="mt-4 grid grid-cols-3 gap-3 pt-4 border-t border-primary/20 animate-in fade-in slide-in-from-top-1" onClick={e => e.stopPropagation()}>
+                          <div className="space-y-1">
                             <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">{t("Price", "कीमत")}</label>
                             <Input type="number" className="h-9 border-[#cacbcf] bg-white text-sm focus:border-primary" value={sel.editedPrice} onChange={e => updateSel(item.id,"editedPrice",Number(e.target.value))} />
                           </div>
-                          <div className="flex-1 space-y-1">
-                            <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">{t("Initial Stock", "स्टॉक")}</label>
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">{t("Stock", "स्टॉक")}</label>
                             <Input type="number" className="h-9 border-[#cacbcf] bg-white text-sm focus:border-primary" value={sel.stock} onChange={e => updateSel(item.id,"stock",Number(e.target.value))} />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">{t("Unit", "इकाई")}</label>
+                            <Input 
+                              className="h-9 border-[#cacbcf] bg-white text-sm focus:border-primary" 
+                              value={sel.editedUnit} 
+                              list="unit-options"
+                              onChange={e => updateSel(item.id,"editedUnit",e.target.value)} 
+                            />
+                            <datalist id="unit-options">
+                              <option value="kg" />
+                              <option value="gm" />
+                              <option value="pcs" />
+                              <option value="packet" />
+                              <option value="bottle" />
+                              <option value="ltr" />
+                              <option value="ml" />
+                              <option value="box" />
+                              <option value="bag" />
+                              <option value="dozen" />
+                            </datalist>
                           </div>
                         </div>
                       )}

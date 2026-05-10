@@ -127,8 +127,13 @@ async function seed() {
           // Randomize slightly for variety
           const price = (basePrice + Math.floor(Math.random() * 120)).toString();
           
+          // For Grains, Pulses, Oils, etc., don't add size to name to keep it generic
+          const name = (category === "Grains & Flour" || category === "Pulses & Lentils" || category === "Oils & Ghee") 
+            ? `${brand} ${type}` 
+            : `${brand} ${type} (${size})`;
+
           allItems.push({
-            name: `${brand} ${type} (${size})`,
+            name,
             category,
             price,
             unit

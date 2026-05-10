@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Lock, Loader2, CheckCircle2, ArrowLeft } from "lucide-react";
+import { Lock, Loader2, CheckCircle2, ArrowLeft, Eye, EyeOff } from "lucide-react";
 
 export default function ResetPassword() {
   const { t } = useLanguage();
@@ -21,6 +21,7 @@ export default function ResetPassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,11 +90,34 @@ export default function ResetPassword() {
           <form onSubmit={onSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label className="text-base">{t("New Password", "नया पासवर्ड")}</Label>
-              <Input type="password" placeholder="••••••••" className="h-14 text-lg" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <div className="relative">
+                <Input 
+                  type={showPassword ? "text" : "password"} 
+                  placeholder="••••••••" 
+                  className="h-14 text-lg pr-12" 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                  required 
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
             </div>
             <div className="space-y-2">
               <Label className="text-base">{t("Confirm Password", "पासवर्ड की पुष्टि करें")}</Label>
-              <Input type="password" placeholder="••••••••" className="h-14 text-lg" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+              <Input 
+                type={showPassword ? "text" : "password"} 
+                placeholder="••••••••" 
+                className="h-14 text-lg" 
+                value={confirmPassword} 
+                onChange={(e) => setConfirmPassword(e.target.value)} 
+                required 
+              />
             </div>
             <Button type="submit" className="w-full h-14 text-lg font-bold" disabled={loading}>
               {loading ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : <Lock className="mr-2 h-5 w-5" />}

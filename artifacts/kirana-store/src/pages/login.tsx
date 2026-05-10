@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Store, Loader2 } from "lucide-react";
+import { Store, Loader2, Eye, EyeOff } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -27,6 +27,7 @@ export default function Login() {
   const { t } = useLanguage();
   const loginMutation = useLoginUser();
 
+  const [showPassword, setShowPassword] = useState(false);
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
@@ -80,12 +81,21 @@ export default function Login() {
             </div>
             <div className="space-y-2">
               <Label className="text-base">{t("Password", "पासवर्ड")}</Label>
-              <Input 
-                {...form.register("password")} 
-                type="password" 
-                placeholder="••••••••" 
-                className="h-14 text-lg"
-              />
+              <div className="relative">
+                <Input 
+                  {...form.register("password")} 
+                  type={showPassword ? "text" : "password"} 
+                  placeholder="••••••••" 
+                  className="h-14 text-lg pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
               {form.formState.errors.password && (
                 <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>
               )}

@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
-    "build": "pnpm run typecheck && pnpm --filter @workspace/api-server --filter @workspace/kirana-store run build && pnpm --filter @workspace/api-server exec puppeteer browsers install chrome",
+    "build": "pnpm run typecheck && pnpm --filter @workspace/api-server --filter @workspace/kirana-store run build",
+    "postinstall": "pnpm --filter @workspace/api-server exec puppeteer browsers install chrome",
     "start": "pnpm --filter @workspace/api-server start",
     "start:dev": "pnpm --filter @workspace/api-server start:dev",
     "dev": "concurrently \"pnpm --filter @workspace/api-server run dev\" \"pnpm --filter @workspace/kirana-store run dev\"",

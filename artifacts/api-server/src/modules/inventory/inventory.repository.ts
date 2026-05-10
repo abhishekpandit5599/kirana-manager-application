@@ -1,5 +1,5 @@
 import { db, itemsTable, defaultItemsTable } from "@workspace/db";
-import { eq, and, ilike, or, desc } from "drizzle-orm";
+import { eq, and, ilike, or, desc, sql } from "drizzle-orm";
 
 export const inventoryRepository = {
   async findAllByShop(shopId: string, filters: any = {}, pagination: { limit: number; offset: number } = { limit: 20, offset: 0 }) {
@@ -18,6 +18,10 @@ export const inventoryRepository = {
       if (searchCols.length > 0) {
         conditions.push(or(...searchCols)!);
       }
+    }
+
+    if (filters.lowStock === "true") {
+      conditions.push(sql`${itemsTable.stock} <= ${itemsTable.lowStockThreshold}`);
     }
 
     let query = db.select()

@@ -155,6 +155,10 @@ export default function Billing() {
   };
 
   const setQuantityDirect = (id: string, val: string) => {
+    if (val === "" || val === "0") {
+      setCart(prev => prev.map(item => item.id === id ? { ...item, cartQuantity: 0 } : item));
+      return;
+    }
     const n = parseFloat(val);
     if (isNaN(n) || n < 0) return;
     setCart(prev => prev.map(item => {
@@ -288,7 +292,7 @@ export default function Billing() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-110px)] md:h-[calc(100vh-140px)] min-h-[600px] pt-0">
+    <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-110px)] md:h-[calc(100vh-140px)] min-h-[600px] pt-4 md:pt-6">
       {/* Left: Item picker */}
       <div className="w-full lg:w-3/5 flex flex-col gap-3 h-full">
         <div className="md:sticky md:top-0 z-20 -mx-4 md:-mx-0 px-4 md:px-0 pt-6 pb-4 space-y-4 md:bg-background/95 md:backdrop-blur-md">
@@ -417,7 +421,7 @@ export default function Billing() {
                           type="number"
                           min="0"
                           step="0.01"
-                          value={displayQty}
+                          value={displayQty === 0 ? "" : displayQty}
                           onChange={e => setQuantityDirect(item.id, e.target.value)}
                           className="w-14 text-center text-sm font-bold bg-transparent border-b border-border outline-none focus:border-primary"
                         />

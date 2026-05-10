@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Store, Loader2, Eye, EyeOff } from "lucide-react";
+import { SEO } from "@/components/seo";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -58,6 +59,7 @@ export default function Register() {
 
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-primary/5 p-4 py-8">
+      <SEO title="Register" description="Join KiranaPro today and manage your store smarter." />
       <Card className="w-full max-w-md shadow-xl border-primary/20">
         <CardHeader className="space-y-3 text-center pb-6">
           <div className="mx-auto bg-primary text-primary-foreground w-16 h-16 flex items-center justify-center rounded-2xl shadow-lg mb-2">

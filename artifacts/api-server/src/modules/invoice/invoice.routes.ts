@@ -14,6 +14,6 @@ router.get("/invoices/:id/pdf", authMiddleware, invoiceController.getInvoicePdf)
 router.get("/invoices/:id/excel", authMiddleware, invoiceController.getInvoiceExcel);
 
 // Public route for WhatsApp PDF link
-router.get("/invoices/public/:id/pdf", invoiceController.getPublicInvoicePdf);
+router.get("/invoices/public/pdf/:id", invoiceController.getPublicInvoicePdf);
 
 export default router;

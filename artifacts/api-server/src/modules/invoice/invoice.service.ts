@@ -116,7 +116,7 @@ export const invoiceService = {
       status: data.status ?? "paid",
     });
 
-    const pdfUrl = `${baseUrl}/api/invoices/public/${invoice.id}/pdf`;
+    const pdfUrl = `${baseUrl}/api/invoices/public/pdf/${invoice.id}`;
 
     // Send WhatsApp invoice in background
     if (data.customerPhone) {

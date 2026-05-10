@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Store, Loader2, Eye, EyeOff } from "lucide-react";
+import { SEO } from "@/components/seo";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -55,6 +56,7 @@ export default function Login() {
 
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-primary/5 p-4">
+      <SEO title="Login" description="Login to your KiranaPro dashboard to manage your store." />
       <Card className="w-full max-w-md shadow-xl border-primary/20">
         <CardHeader className="space-y-3 text-center pb-6">
           <div className="mx-auto bg-primary text-primary-foreground w-16 h-16 flex items-center justify-center rounded-2xl shadow-lg mb-2">

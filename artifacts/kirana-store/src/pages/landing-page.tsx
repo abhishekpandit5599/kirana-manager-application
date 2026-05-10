@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { SEO } from "@/components/seo";
 import { 
   Accordion,
   AccordionContent,
@@ -66,6 +67,11 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-emerald-100 selection:text-emerald-900">
+      <SEO 
+        title="Smart Kirana Store Management" 
+        description="The smarter way to manage your Kirana store. AI-powered tools for billing, inventory, and customer Udhaar tracking. Trusted by 5,000+ stores."
+        ogImage={IMAGES.dashboard}
+      />
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? "bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-100 py-3" : "bg-transparent py-5"}`}>
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">

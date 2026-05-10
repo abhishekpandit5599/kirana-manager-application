@@ -18,6 +18,7 @@ import {
   Loader2
 } from "lucide-react";
 import { ErrorState } from "@/components/error-state";
+import { SEO } from "@/components/seo";
 import { 
   LineChart, 
   Line, 
@@ -69,7 +70,8 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <SEO title="Dashboard" description="Your KiranaPro overview. Track sales, inventory, and analytics." />
       {/* Sticky Header Section */}
       <div className="md:sticky md:top-0 z-20 -mx-4 md:-mx-6 px-4 md:px-6 pt-6 pb-4 space-y-4 md:bg-background/95 md:backdrop-blur-md">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

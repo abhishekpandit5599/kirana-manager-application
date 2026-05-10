@@ -21,54 +21,95 @@ export const authService = {
     const record = await authRepository.findValidOtp(email, otp);
     if (!record) throw new AppError(400, "Invalid OTP", "OTP_INVALID");
     if (isOtpExpired(record.expiresAt)) throw new AppError(400, "OTP has expired", "OTP_EXPIRED");
+    
     await authRepository.markOtpVerified(record.id);
+    
+    // Mark user as verified if they exist
+    const user = await authRepository.findUserByEmail(email);
+    if (user) {
+      if (!user.isVerified) {
+        await authRepository.updateUserVerification(user.id, true);
+      }
+      
+      // Get shop info for token
+      const [membership] = await db.select().from(shopMembersTable).where(eq(shopMembersTable.userId, user.id));
+      if (membership) {
+        const [shop] = await db.select().from(shopsTable).where(eq(shopsTable.id, membership.shopId));
+        if (shop) {
+          const token = signToken(user.id, shop.id);
+          return { 
+            verified: true, 
+            otpTokenId: record.id,
+            token,
+            user: authService.formatUser(user, shop)
+          };
+        }
+      }
+    }
+    
     return { verified: true, otpTokenId: record.id };
   },
 
   async register(data: { name: string; shopName: string; email: string; password: string; phone?: string }) {
     const existing = await authRepository.findUserByEmail(data.email);
-    if (existing) throw new AppError(400, "Email already registered", "CONFLICT");
+    if (existing && existing.isVerified) {
+      throw new AppError(400, "Email already registered", "CONFLICT");
+    }
 
     const passwordHash = await hashPassword(data.password);
-    const user = await authRepository.createUser({
-      name: data.name,
-      email: data.email,
-      passwordHash,
-      phone: data.phone ?? null,
-    });
+    let user;
+    
+    if (existing) {
+      // Update existing unverified user
+      user = await authRepository.updateUser(existing.id, {
+        name: data.name,
+        passwordHash,
+        phone: data.phone ?? null,
+      });
+      // Ensure shop exists or update it?
+      // For simplicity, we'll assume they need to complete registration
+    } else {
+      user = await authRepository.createUser({
+        name: data.name,
+        email: data.email,
+        passwordHash,
+        phone: data.phone ?? null,
+        isVerified: false,
+      });
 
-    const [shop] = await db.insert(shopsTable).values({
-      name: data.shopName,
-      ownerUserId: user.id,
-    }).returning();
+      const [shop] = await db.insert(shopsTable).values({
+        name: data.shopName,
+        ownerUserId: user.id,
+      }).returning();
 
-    await db.insert(shopMembersTable).values({
-      shopId: shop.id,
-      userId: user.id,
-      role: "owner",
-    });
-
-    // Create default shop settings
-    await db.insert(shopSettingsTable).values({ shopId: shop.id }).onConflictDoNothing();
-
-    const token = signToken(user.id, shop.id);
-    return {
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        shopName: shop.name,
+      await db.insert(shopMembersTable).values({
         shopId: shop.id,
-        email: user.email,
-        phone: user.phone,
-        createdAt: user.createdAt.toISOString(),
-      },
+        userId: user.id,
+        role: "owner",
+      });
+
+      await db.insert(shopSettingsTable).values({ shopId: shop.id }).onConflictDoNothing();
+    }
+
+    // Send OTP
+    const otp = generateOtp();
+    const expiresAt = getOtpExpiry(10);
+    await authRepository.createOtp(data.email, otp, expiresAt);
+    await sendOtpEmail(data.email, otp);
+
+    return {
+      message: "OTP sent to email. Please verify to complete registration.",
+      email: data.email
     };
   },
 
   async login(email: string, password: string) {
     const user = await authRepository.findUserByEmail(email);
     if (!user) throw new AppError(401, "Invalid email or password");
+
+    if (!user.isVerified) {
+      throw new AppError(401, "Please verify your email first", "UNVERIFIED");
+    }
 
     const valid = await comparePassword(password, user.passwordHash);
     // Also check legacy sha256 hash for backward compat

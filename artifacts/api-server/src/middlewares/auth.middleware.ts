@@ -41,6 +41,11 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
     return;
   }
 
+  if (!user.isVerified) {
+    res.status(401).json({ error: "Email not verified", code: "UNVERIFIED" });
+    return;
+  }
+
   const [shop] = await db.select().from(shopsTable).where(eq(shopsTable.id, payload.shopId));
   if (!shop) {
     res.status(401).json({ error: "Shop not found" });

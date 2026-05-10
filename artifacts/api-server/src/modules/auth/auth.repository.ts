@@ -13,9 +13,18 @@ export const authRepository = {
     return user ?? null;
   },
 
-  async createUser(data: { name: string; email: string; passwordHash: string; phone?: string | null }) {
+  async createUser(data: { name: string; email: string; passwordHash: string; phone?: string | null; isVerified?: boolean }) {
     const [user] = await db.insert(usersTable).values(data).returning();
     return user;
+  },
+
+  async updateUser(id: string, data: Partial<{ name: string; passwordHash: string; phone: string | null }>) {
+    const [user] = await db.update(usersTable).set(data).where(eq(usersTable.id, id)).returning();
+    return user;
+  },
+
+  async updateUserVerification(id: string, isVerified: boolean) {
+    await db.update(usersTable).set({ isVerified }).where(eq(usersTable.id, id));
   },
 
   async updateUserPassword(userId: string, passwordHash: string) {

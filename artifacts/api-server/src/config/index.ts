@@ -16,6 +16,7 @@ export const config = {
   smtpPort: Number(process.env.SMTP_PORT ?? 587),
   smtpUser: process.env.SMTP_USER ?? "",
   smtpPass: process.env.SMTP_PASS ?? "",
+  smtpFromUser: process.env.SMTP_FROM_USER ?? "",
 
   // Twilio WhatsApp
   twilioAccountSid: process.env.TWILIO_ACCOUNT_SID ?? "",

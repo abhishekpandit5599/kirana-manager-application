@@ -88,14 +88,13 @@ export function Layout({ children }: LayoutProps) {
   ];
 
   const ShopLogo = ({ size = "sm" }: { size?: "sm" | "lg" }) => {
-    const dim = size === "lg" ? "w-10 h-10" : "w-8 h-8";
+    const dim = size === "lg" ? "w-12 h-12" : "w-8 h-8";
     if (logoUrl) {
       return <img src={logoUrl} alt="Shop Logo" className={`${dim} rounded-lg object-cover border border-white/20`} />;
     }
+    const fallbackSrc = size === "lg" ? "/kirana.png" : "/logo.png";
     return (
-      <div className={`${dim} rounded-lg bg-white/20 flex items-center justify-center`}>
-        <Store className={size === "lg" ? "w-5 h-5" : "w-4 h-4"} />
-      </div>
+      <img src={fallbackSrc} alt="Kirana Logo" className={`${dim} rounded-xl object-cover bg-white shadow-sm`} />
     );
   };
 
@@ -160,7 +159,7 @@ export function Layout({ children }: LayoutProps) {
           </SheetContent>
         </Sheet>
         <div className="flex items-center gap-2">
-          {logoUrl && <img src={logoUrl} alt="" className="w-7 h-7 rounded-md object-cover" />}
+          <img src={logoUrl || "/logo.png"} alt="" className="w-7 h-7 rounded-md object-cover bg-primary/10" />
           <h1 className="text-base font-bold text-primary truncate max-w-[150px]">{settings.shopName || (user as any)?.shopName || "Kirana"}</h1>
         </div>
         <div className="flex bg-muted rounded-lg p-0.5">

@@ -59,10 +59,9 @@ export default function Login() {
       <SEO title="Login" description="Login to your KiranaPro dashboard to manage your store." />
       <Card className="w-full max-w-md shadow-xl border-primary/20">
         <CardHeader className="space-y-3 text-center pb-6">
-          <div className="mx-auto bg-primary text-primary-foreground w-16 h-16 flex items-center justify-center rounded-2xl shadow-lg mb-2">
-            <Store className="w-8 h-8" />
+          <div className="mx-auto flex items-center justify-center mb-6">
+            <img src="/kirana_logo.png" alt="KiranaPro" className="h-14 md:h-16 w-auto object-contain" />
           </div>
-          <CardTitle className="text-3xl font-bold text-foreground">Kirana Manager</CardTitle>
           <CardDescription className="text-lg text-muted-foreground">
             {t("Sign in to manage your store", "अपनी दुकान प्रबंधित करने के लिए साइन इन करें")}
           </CardDescription>

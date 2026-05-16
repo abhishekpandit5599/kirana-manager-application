@@ -75,11 +75,8 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? "bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-100 py-3" : "bg-transparent py-5"}`}>
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-emerald-600 text-white p-1.5 rounded-lg">
-              <Store className="w-6 h-6" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-slate-900">KiranaPro</span>
+          <div className="flex items-center">
+            <img src="/kirana_logo.png" alt="KiranaPro" className="h-10 w-auto md:h-14" />
           </div>
 
           {/* Desktop Nav */}
@@ -598,11 +595,8 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
             <div className="col-span-2 space-y-6">
-              <div className="flex items-center gap-2">
-                <div className="bg-emerald-600 text-white p-1.5 rounded-lg">
-                  <Store className="w-6 h-6" />
-                </div>
-                <span className="text-2xl font-bold tracking-tight text-slate-900">KiranaPro</span>
+              <div className="flex items-center">
+                <img src="/kirana_logo.png" alt="KiranaPro" className="h-12 w-auto md:h-16" />
               </div>
               <p className="text-slate-500 text-lg leading-relaxed max-w-sm">
                 Empowering Indian kirana stores with simple, powerful, and free digital tools to manage their business efficiently.
